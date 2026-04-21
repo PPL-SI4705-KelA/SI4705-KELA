@@ -50,4 +50,41 @@ class User extends Authenticatable
             'is_active' => 'boolean',
         ];
     }
+
+    // ----------------------------------------------------------------
+    // Role helpers
+    // ----------------------------------------------------------------
+
+    /** Daftar role yang valid. */
+    public const ROLES = ['user', 'admin', 'petugas'];
+
+    /** Apakah pengguna adalah admin? */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /** Apakah pengguna adalah petugas? */
+    public function isPetugas(): bool
+    {
+        return $this->role === 'petugas';
+    }
+
+    /** Apakah pengguna adalah user biasa? */
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
+    }
+
+    /**
+     * Kembalikan nama route dashboard sesuai role.
+     */
+    public function dashboardRoute(): string
+    {
+        return match ($this->role) {
+            'admin'   => 'admin.dashboard',
+            'petugas' => 'petugas.dashboard',
+            default   => 'user.dashboard',
+        };
+    }
 }
