@@ -41,10 +41,36 @@
                         <a href="{{ route('register') }}" class="bg-[#1b7b43] text-white px-4 py-2 rounded-full hover:bg-green-700 transition">Ikut Kegiatan</a>
                     @else
                         <a href="{{ route('dashboard') }}" class="text-gray-500 hover:text-black">Dashboard</a>
-                        <form method="POST" action="{{ route('logout') }}" class="inline">
-                            @csrf
-                            <button type="submit" class="bg-red-50 text-red-600 px-4 py-2 rounded-full hover:bg-red-100 transition">Logout</button>
-                        </form>
+
+                        <!-- Profile Dropdown -->
+                        <div class="relative group">
+                            <!-- Avatar -->
+                            <div class="w-10 h-10 rounded-full bg-[#1b7b43] flex items-center justify-center text-white font-bold cursor-pointer">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                            </div>
+
+                            <!-- Dropdown -->
+                            <div class="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg hidden group-hover:block z-50">
+                                
+                                <!-- Info user -->
+                                <div class="px-4 py-2 border-b">
+                                    <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->name }}</p>
+                                    <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</p>
+                                </div>
+
+                                <!-- Menu -->
+                                <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm hover:bg-gray-100">
+                                    Profil
+                                </a>
+
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
+                                        Logout
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     @endguest
                 </div>
             </header>
