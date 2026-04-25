@@ -23,22 +23,26 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', 'check.active'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Profile
+    Route::prefix('profile')->name('profile.')->group(function () {
+
+        // Read only
+        Route::get('/', [ProfileController::class, 'index'])->name('index');
+
+        // Edit page
+        Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
+
+        // Update data
+        Route::post('/update', [ProfileController::class, 'update'])->name('update');
+
+        // Change password page
+        Route::get('/password', [ProfileController::class, 'showChangePasswordForm'])
+            ->name('password.form');
+
+        // Process change password
+        Route::post('/password', [ProfileController::class, 'updatePassword'])
+            ->name('password.update');
+    });
 });
 
-//Profil
-Route::prefix('profile')->group(function () {
-
-    // Halaman profil
-    Route::get('/', [ProfileController::class, 'index'])->name('profile');
-
-    // Update profil
-    Route::post('/update', [ProfileController::class, 'update'])->name('profile.update');
-
-    // Halaman ubah password
-    Route::get('/password', [ProfileController::class, 'showChangePasswordForm'])
-        ->name('profile.password.form');
-
-    // Proses ubah password
-    Route::post('/password', [ProfileController::class, 'updatePassword'])
-        ->name('profile.password.update');
-});
