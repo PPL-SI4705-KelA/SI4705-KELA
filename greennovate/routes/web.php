@@ -3,14 +3,17 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Petugas\PetugasDashboardController;
+use Illuminate\Support\Facades\Route;
 
+// ─── Public ───────────────────────────────────────────────────────────────────
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Guest routes
+// ─── Guest routes ─────────────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'showForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
@@ -19,30 +22,39 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
 });
 
-// Auth routes
+// ─── Authenticated routes (semua role) ────────────────────────────────────────
 Route::middleware(['auth', 'check.active'])->group(function () {
+
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+    // Dispatcher: redirect ke dashboard sesuai role
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Profile
+    // ── Profile (semua role yang sudah login) ──
     Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/',         [ProfileController::class, 'index'])->name('index');
+        Route::get('/edit',     [ProfileController::class, 'edit'])->name('edit');
+        Route::post('/update',  [ProfileController::class, 'update'])->name('update');
+        Route::get('/password', [ProfileController::class, 'showChangePasswordForm'])->name('password.form');
+        Route::post('/password',[ProfileController::class, 'updatePassword'])->name('password.update');
+    });
 
-        // Read only
-        Route::get('/', [ProfileController::class, 'index'])->name('index');
+    // ── Admin routes ───────────────────────────────────────────────────────────
+    // Hanya bisa diakses user dengan role 'admin'.
+    // Jika role lain mencoba → 403
+    Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        // Tambahkan route admin lainnya di sini, contoh:
+        // Route::resource('users', AdminUserController::class);
+        // Route::resource('kegiatan', AdminKegiatanController::class);
+    });
 
-        // Edit page
-        Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
-
-        // Update data
-        Route::post('/update', [ProfileController::class, 'update'])->name('update');
-
-        // Change password page
-        Route::get('/password', [ProfileController::class, 'showChangePasswordForm'])
-            ->name('password.form');
-
-        // Process change password
-        Route::post('/password', [ProfileController::class, 'updatePassword'])
-            ->name('password.update');
+    // ── Petugas routes ─────────────────────────────────────────────────────────
+    // Hanya bisa diakses user dengan role 'petugas'.
+    // Jika role lain mencoba → 403
+    Route::prefix('petugas')->name('petugas.')->middleware('role:petugas')->group(function () {
+        Route::get('/dashboard', [PetugasDashboardController::class, 'index'])->name('dashboard');
+        // Tambahkan route petugas lainnya di sini, contoh:
+        // Route::resource('donasi', PetugasDonasController::class);
     });
 });
-
