@@ -21,6 +21,7 @@
             body { font-family: 'Instrument Sans', sans-serif; }
         </style>
     </head>
+    <script src="//unpkg.com/alpinejs" defer></script>
     <body class="bg-[#Fdfdfc] text-[#1b1b18] antialiased">
         <div class="min-h-screen flex flex-col pt-12 items-center">
             
@@ -43,34 +44,42 @@
                         <a href="{{ route('dashboard') }}" class="text-gray-500 hover:text-black">Dashboard</a>
 
                         <!-- Profile Dropdown -->
-                        <div class="relative group">
-                            <!-- Avatar -->
-                            <div class="w-10 h-10 rounded-full bg-[#1b7b43] flex items-center justify-center text-white font-bold cursor-pointer">
-                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                        <div class="relative" x-data="{ open: false }">
+
+                        <!-- Avatar -->
+                        <button @click="open = !open"
+                            class="w-10 h-10 rounded-full bg-[#1b7b43] flex items-center justify-center text-white font-bold cursor-pointer">
+                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div x-show="open"
+                            @click.outside="open = false"
+                            x-transition
+                            class="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                            
+                            <!-- Info user -->
+                            <div class="px-4 py-2 border-b">
+                                <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->name }}</p>
+                                <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</p>
                             </div>
 
-                            <!-- Dropdown -->
-                            <div class="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg hidden group-hover:block z-50">
-                                
-                                <!-- Info user -->
-                                <div class="px-4 py-2 border-b">
-                                    <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->name }}</p>
-                                    <p class="text-xs text-gray-500 truncate">{{ Auth::user()->email }}</p>
-                                </div>
+                            <!-- Menu -->
+                            <a href="{{ route('profile.index') }}" 
+                            class="block px-4 py-2 text-sm hover:bg-gray-100">
+                                Profil
+                            </a>
 
-                                <!-- Menu -->
-                                <a href="{{ route('profile.index') }}" class="block px-4 py-2 text-sm hover:bg-gray-100">
-                                    Profil
-                                </a>
-
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
-                                        Logout
-                                    </button>
-                                </form>
-                            </div>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit"
+                                    class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
+                                    Logout
+                                </button>
+                            </form>
                         </div>
+
+                    </div>
                     @endguest
                 </div>
             </header>
