@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\LokasiLahanController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -22,4 +24,21 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', 'check.active'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Profile
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [ProfileController::class, 'index'])->name('index');
+        Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
+        Route::post('/update', [ProfileController::class, 'update'])->name('update');
+        Route::get('/password', [ProfileController::class, 'showChangePasswordForm'])->name('password.form');
+        Route::post('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+    });
+
+    // Admin routes
+    Route::middleware('is.admin')
+        ->prefix('admin')
+        ->name('admin.')
+        ->group(function () {
+            Route::resource('lokasi', LokasiLahanController::class);
+        });
 });
