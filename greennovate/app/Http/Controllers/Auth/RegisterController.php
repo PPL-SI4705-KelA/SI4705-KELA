@@ -40,12 +40,26 @@ class RegisterController extends Controller
 
         // Tentukan apakah input adalah email atau nomor HP
         if (filter_var($loginValue, FILTER_VALIDATE_EMAIL)) {
+            // Validasi unik email
+            $request->validate([
+                'login' => ['unique:users,email'],
+            ], [
+                'login.unique' => 'Email ini sudah terdaftar. Silakan gunakan email lain atau masuk.',
+            ]);
+
             $userData = [
                 'name'     => $request->name,
                 'email'    => $loginValue,
                 'password' => $request->password,
             ];
         } else {
+            // Validasi unik nomor HP
+            $request->validate([
+                'login' => ['unique:users,phone'],
+            ], [
+                'login.unique' => 'Nomor HP ini sudah terdaftar. Silakan gunakan nomor lain atau masuk.',
+            ]);
+
             $userData = [
                 'name'     => $request->name,
                 'phone'    => $loginValue,
@@ -58,6 +72,11 @@ class RegisterController extends Controller
         // Login otomatis setelah registrasi
         Auth::login($user);
 
-        return redirect()->route('dashboard')->with('success', 'Selamat datang di Greennovate!');
+        // Admin diarahkan ke dashboard admin
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard')->with('success', 'Selamat datang, Admin!');
+        }
+
+        return redirect('/')->with('success', 'Selamat datang di Greennovate!');
     }
 }

@@ -30,6 +30,7 @@
             </p>
 
             {{-- CTA --}}
+            @guest
             <div class="flex flex-wrap gap-4">
                 <a href="{{ route('register') }}" id="hero-register-btn"
                    class="inline-flex items-center gap-2 bg-[#0D8B41] hover:bg-[#085c2b] text-white font-semibold px-7 py-3.5 rounded-full transition-all hover:shadow-xl hover:shadow-green-900/25 hover:-translate-y-0.5 text-base">
@@ -43,6 +44,7 @@
                     Masuk
                 </a>
             </div>
+            @endguest
 
             {{-- Statistik Ringkas --}}
             <div class="flex items-center gap-6 mt-10 pt-10 border-t border-gray-100">
@@ -291,6 +293,7 @@
 </section>
 
 {{-- ========== CTA SECTION ========== --}}
+@guest
 <section class="py-24 bg-gradient-to-br from-[#0D8B41] to-[#085c2b] relative overflow-hidden">
     <div class="orb w-[500px] h-[500px] bg-white/5 -top-[200px] right-[-100px]"></div>
     <div class="max-w-3xl mx-auto px-6 text-center relative z-10 reveal">
@@ -313,5 +316,6 @@
         </div>
     </div>
 </section>
+@endguest
 
 @endsection

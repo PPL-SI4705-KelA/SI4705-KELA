@@ -154,6 +154,20 @@
                     <a href="#mission" class="hover:text-[#0D8B41] transition-colors">Misi</a>
                     <a href="#features" class="hover:text-[#0D8B41] transition-colors">Fitur</a>
                     <a href="#how-it-works" class="hover:text-[#0D8B41] transition-colors">Cara Kerja</a>
+                    @auth
+                        <a href="#" id="nav-donasi-link" class="flex items-center gap-1.5 hover:text-[#0D8B41] transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                            Donasi
+                        </a>
+                        <a href="#" id="nav-riwayat-link" class="flex items-center gap-1.5 hover:text-[#0D8B41] transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Riwayat
+                        </a>
+                    @endauth
                 </div>
 
                 <!-- Auth CTA -->
@@ -164,10 +178,24 @@
                             Daftar Gratis
                         </a>
                     @else
-                        <a href="{{ route('dashboard') }}" class="text-sm font-semibold text-gray-600 hover:text-[#0D8B41] transition-colors">Dashboard</a>
+                        {{-- User avatar + name --}}
+                        <a href="{{ route('dashboard') }}" id="nav-user-pill"
+                           class="flex items-center gap-2 bg-green-50 border border-green-100 rounded-full pl-1 pr-4 py-1 hover:bg-green-100 transition-colors">
+                            <div class="w-7 h-7 rounded-full bg-[#0D8B41] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                            </div>
+                            <span class="text-sm font-semibold text-gray-700">{{ auth()->user()->name }}</span>
+                        </a>
+
+                        {{-- Logout icon button --}}
                         <form method="POST" action="{{ route('logout') }}" class="inline">
                             @csrf
-                            <button type="submit" class="bg-red-50 text-red-600 text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-red-100 transition">Logout</button>
+                            <button type="submit" id="nav-logout-btn" title="Logout"
+                                    class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+                            </button>
                         </form>
                     @endguest
                 </div>
@@ -264,6 +292,37 @@
             }, { threshold: 0.12 });
             revealEls.forEach(el => observer.observe(el));
         </script>
+
+        {{-- Flash Toast Notification --}}
+        @if(session('success'))
+        <div id="flash-toast"
+             class="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-white border border-green-200 shadow-xl rounded-2xl px-5 py-4 text-sm font-medium text-gray-700 transition-all duration-500"
+             style="animation: slideInToast 0.4s ease-out both;">
+            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-[#0D8B41]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+            <span>{{ session('success') }}</span>
+        </div>
+        <style>
+            @keyframes slideInToast {
+                from { opacity: 0; transform: translateY(20px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+        </style>
+        <script>
+            setTimeout(() => {
+                const toast = document.getElementById('flash-toast');
+                if (toast) {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateY(20px)';
+                    setTimeout(() => toast.remove(), 500);
+                }
+            }, 3500);
+        </script>
+        @endif
+
         @yield('scripts')
     </body>
 </html>

@@ -13,35 +13,54 @@
     @endif
     <style>
         body { font-family: 'Instrument Sans', sans-serif; }
-        .sidebar-link { @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/10 hover:text-white transition-all; }
-        .sidebar-link.active { @apply bg-[#0D8B41] text-white; }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 14px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4b5563;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+        .sidebar-link:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+        .sidebar-link.active {
+            background: #0D8B41;
+            color: #ffffff;
+        }
+        .sidebar-link.active svg { color: #fff; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex">
 
     {{-- Sidebar --}}
-    <aside class="w-64 min-h-screen bg-[#0a1f14] text-white flex flex-col fixed top-0 left-0 z-30">
+    <aside class="w-56 min-h-screen bg-white border-r border-gray-200 flex flex-col fixed top-0 left-0 z-30">
         {{-- Logo --}}
-        <div class="px-6 py-5 border-b border-white/10">
-            <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5">
+        <div class="px-5 py-4 border-b border-gray-100">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5">
                 <div class="w-8 h-8 rounded-lg bg-[#0D8B41] flex items-center justify-center">
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 3c-1.2 5.4-5 7-5 11a5 5 0 0010 0c0-4-3.8-5.6-5-11z"/>
                     </svg>
                 </div>
                 <div>
-                    <span class="font-bold text-base text-white">Greennovate</span>
-                    <span class="block text-xs text-green-400 font-medium">Admin Panel</span>
+                    <span class="font-bold text-sm text-gray-900">Greennovate</span>
+                    <span class="block text-xs text-[#0D8B41] font-medium">Admin Panel</span>
                 </div>
             </a>
         </div>
 
         {{-- Navigation --}}
-        <nav class="flex-1 px-4 py-6 space-y-1">
-            <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3 px-4">Menu Utama</p>
+        <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
 
-            <a href="{{ route('dashboard') }}"
-               class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+            {{-- Dashboard --}}
+            <a href="{{ route('admin.dashboard') }}"
+               class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
@@ -49,45 +68,65 @@
                 Dashboard
             </a>
 
-            <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3 px-4 mt-6">Master Data</p>
-
-            <a href="{{ route('admin.lokasi.index') }}"
-               class="sidebar-link {{ request()->routeIs('admin.lokasi.*') ? 'active' : '' }}">
+            {{-- Kegiatan --}}
+            <a href="#"
+               class="sidebar-link {{ request()->routeIs('admin.kegiatan.*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
-                Lokasi Lahan
+                Kegiatan
             </a>
+
+            {{-- Sumbangan --}}
+            <a href="#"
+               class="sidebar-link {{ request()->routeIs('admin.sumbangan.*') ? 'active' : '' }}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+                Sumbangan
+            </a>
+
+            {{-- Pengguna --}}
+            <a href="#"
+               class="sidebar-link {{ request()->routeIs('admin.pengguna.*') ? 'active' : '' }}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                Pengguna
+            </a>
+
         </nav>
 
         {{-- User info --}}
-        <div class="px-4 py-4 border-t border-white/10">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-sm font-bold">
+        <div class="px-3 py-4 border-t border-gray-100">
+            <div class="flex items-center gap-2.5 mb-2 px-1">
+                <div class="w-8 h-8 rounded-full bg-[#0D8B41] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                     {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-white truncate">{{ Auth::user()->name }}</p>
-                    <p class="text-xs text-gray-400 uppercase">{{ Auth::user()->role }}</p>
+                    <p class="text-xs font-semibold text-gray-800 truncate">{{ Auth::user()->name }}</p>
+                    <p class="text-xs text-gray-400 truncate">{{ Auth::user()->email ?? Auth::user()->phone }}</p>
                 </div>
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit"
-                        class="w-full text-left flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-red-400 hover:bg-red-900/20 hover:text-red-300 transition">
+                        class="sidebar-link w-full text-gray-500 hover:text-red-600 hover:bg-red-50">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                     </svg>
-                    Logout
+                    Keluar
                 </button>
             </form>
         </div>
     </aside>
 
     {{-- Main Content --}}
-    <div class="flex-1 ml-64 flex flex-col min-h-screen">
+    <div class="flex-1 ml-56 flex flex-col min-h-screen">
 
         {{-- Top Bar --}}
         <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between sticky top-0 z-20">
