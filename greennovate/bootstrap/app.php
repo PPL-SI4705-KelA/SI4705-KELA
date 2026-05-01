@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'check.active' => \App\Http\Middleware\CheckActive::class,
             'is.admin'     => \App\Http\Middleware\IsAdmin::class,
+            'is.petugas'   => \App\Http\Middleware\IsPetugas::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

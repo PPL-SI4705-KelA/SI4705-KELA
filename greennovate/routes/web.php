@@ -5,12 +5,12 @@ use App\Http\Controllers\Admin\LokasiLahanController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LandingController;
+use App\Http\Controllers\Petugas\PetugasDashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [LandingController::class, 'index'])->name('home');
 
 // Guest routes
 Route::middleware('guest')->group(function () {
@@ -42,5 +42,13 @@ Route::middleware(['auth', 'check.active'])->group(function () {
         ->group(function () {
             Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
             Route::resource('lokasi', LokasiLahanController::class);
+        });
+
+    // Petugas routes
+    Route::middleware('is.petugas')
+        ->prefix('petugas')
+        ->name('petugas.')
+        ->group(function () {
+            Route::get('/dashboard', [PetugasDashboardController::class, 'index'])->name('dashboard');
         });
 });

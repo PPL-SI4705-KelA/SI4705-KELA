@@ -21,13 +21,13 @@
             :root {
                 --green-primary: #0D8B41;
                 --green-dark: #085c2b;
-                --green-light: #e8f8ee;
+                --green-light: #e8f5ee;
                 --text-dark: #111827;
                 --text-muted: #6b7280;
-                --bg-page: #fafaf8;
+                --bg-page: #f0f0eb;
             }
 
-            * { scroll-behavior: smooth; }
+            * { scroll-behavior: smooth; box-sizing: border-box; }
 
             body {
                 font-family: 'Instrument Sans', sans-serif;
@@ -36,164 +36,169 @@
                 -webkit-font-smoothing: antialiased;
             }
 
-            /* Navbar glass effect */
+            /* Navbar */
             .navbar-glass {
-                background: rgba(250, 250, 248, 0.85);
+                background: rgba(240, 240, 235, 0.92);
                 backdrop-filter: blur(16px);
                 -webkit-backdrop-filter: blur(16px);
                 border-bottom: 1px solid rgba(0,0,0,0.06);
             }
 
-            /* Gradient orb background decorations */
-            .orb {
-                position: absolute;
-                border-radius: 50%;
-                filter: blur(80px);
-                pointer-events: none;
-                z-index: 0;
-            }
-
-            /* Section reveal animation */
+            /* Reveal animation */
             .reveal {
                 opacity: 0;
-                transform: translateY(32px);
-                transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+                transform: translateY(24px);
+                transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
             }
-            .reveal.visible {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            .reveal.visible { opacity: 1; transform: translateY(0); }
 
-            /* Pulse ring for hero badge */
-            @keyframes ping-slow {
-                75%, 100% { transform: scale(2); opacity: 0; }
+            /* Hero animations */
+            @keyframes fade-up {
+                from { opacity: 0; transform: translateY(30px); }
+                to   { opacity: 1; transform: translateY(0); }
             }
-            .animate-ping-slow {
-                animation: ping-slow 2s cubic-bezier(0,0,0.2,1) infinite;
+            @keyframes fade-left {
+                from { opacity: 0; transform: translateX(30px); }
+                to   { opacity: 1; transform: translateX(0); }
             }
+            .hero-copy  { animation: fade-up  0.8s cubic-bezier(0.16,1,0.3,1) both; }
+            .hero-image { animation: fade-left 1s  cubic-bezier(0.16,1,0.3,1) 0.15s both; }
 
-            /* Floating animation for image card badges */
-            @keyframes float {
-                0%, 100% { transform: translateY(0px); }
-                50% { transform: translateY(-6px); }
+            /* Stat card hover */
+            .stat-card {
+                transition: transform 0.25s ease, box-shadow 0.25s ease;
             }
-            .animate-float { animation: float 3s ease-in-out infinite; }
-            .animate-float-delay { animation: float 3.5s ease-in-out 1s infinite; }
-
-            /* Gradient text */
-            .gradient-text {
-                background: linear-gradient(135deg, var(--green-primary) 0%, #22c55e 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
+            .stat-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 28px rgba(0,0,0,0.08);
             }
 
             /* Feature card hover */
             .feature-card {
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                transition: transform 0.25s ease, box-shadow 0.25s ease;
             }
             .feature-card:hover {
-                transform: translateY(-6px);
-                box-shadow: 0 20px 40px rgba(13,139,65,0.12);
+                transform: translateY(-5px);
+                box-shadow: 0 16px 32px rgba(13,139,65,0.10);
             }
 
-            /* Stat counter animation */
-            @keyframes count-up {
-                from { opacity: 0; transform: translateY(10px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-            .stat-item {
-                animation: count-up 0.6s ease-out forwards;
-            }
+            /* Green heading word */
+            .text-green-word { color: var(--green-primary); }
 
-            /* Hero fade-in */
-            @keyframes fade-in-up {
-                0% { opacity: 0; transform: translateY(40px); }
-                100% { opacity: 1; transform: translateY(0); }
-            }
-            @keyframes fade-in-right {
-                0% { opacity: 0; transform: translateX(-30px); }
-                100% { opacity: 1; transform: translateX(0); }
-            }
-            @keyframes fade-in-left {
-                0% { opacity: 0; transform: translateX(30px); }
-                100% { opacity: 1; transform: translateX(0); }
-            }
-
-            .hero-copy { animation: fade-in-up 0.9s cubic-bezier(0.16,1,0.3,1) both; }
-            .hero-image { animation: fade-in-left 1.1s cubic-bezier(0.16,1,0.3,1) 0.2s both; }
-
-            /* Steps connector line */
+            /* Step connector line */
             .step-line {
                 position: absolute;
-                top: 28px;
-                left: calc(50% + 28px);
-                width: calc(100% - 56px);
-                height: 2px;
+                top: 26px;
+                left: calc(50% + 26px);
+                width: calc(100% - 52px);
+                height: 1px;
                 background: linear-gradient(90deg, #0D8B41 0%, #bbf7d0 100%);
             }
+
+            /* Gradient orb */
+            .orb {
+                position: absolute;
+                border-radius: 50%;
+                filter: blur(70px);
+                pointer-events: none;
+                z-index: 0;
+            }
+
+            /* Animate ping for badge */
+            @keyframes ping-slow {
+                75%, 100% { transform: scale(2); opacity: 0; }
+            }
+            .animate-ping-slow { animation: ping-slow 2s cubic-bezier(0,0,0.2,1) infinite; }
+
+            /* Float for hero image badges */
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-5px); }
+            }
+            .animate-float { animation: float 3s ease-in-out infinite; }
+            .animate-float-delay { animation: float 3.5s ease-in-out 0.8s infinite; }
         </style>
         @yield('styles')
     </head>
     <body>
         <!-- Sticky Navbar -->
         <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 navbar-glass transition-all duration-300">
-            <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
                 <!-- Logo -->
                 <a href="/" class="flex items-center gap-2.5 group">
-                    <div class="w-9 h-9 rounded-xl bg-[#0D8B41] flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-8 h-8 rounded-lg bg-[#0D8B41] flex items-center justify-center shadow group-hover:scale-105 transition-transform">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 3c-1.2 5.4-5 7-5 11a5 5 0 0010 0c0-4-3.8-5.6-5-11z"/>
                         </svg>
                     </div>
-                    <span class="font-bold text-xl text-[#111827] tracking-tight">Greennovate</span>
+                    <span class="font-bold text-lg text-[#111827] tracking-tight">Greennovate</span>
                 </a>
 
-                <!-- Nav Links (desktop) -->
-                <div class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500">
-                    <a href="#mission" class="hover:text-[#0D8B41] transition-colors">Misi</a>
-                    <a href="#features" class="hover:text-[#0D8B41] transition-colors">Fitur</a>
-                    <a href="#how-it-works" class="hover:text-[#0D8B41] transition-colors">Cara Kerja</a>
-                    @auth
-                        <a href="#" id="nav-donasi-link" class="flex items-center gap-1.5 hover:text-[#0D8B41] transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                            </svg>
-                            Donasi
-                        </a>
-                        <a href="#" id="nav-riwayat-link" class="flex items-center gap-1.5 hover:text-[#0D8B41] transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Riwayat
-                        </a>
-                    @endauth
+                <!-- Nav Links (center) -->
+                <div class="hidden md:flex items-center gap-7 text-sm font-medium">
+                    <a href="/" id="nav-beranda"
+                       class="{{ request()->is('/') ? 'text-[#0D8B41] font-semibold' : 'text-gray-500 hover:text-[#0D8B41]' }} transition-colors">
+                        Beranda
+                    </a>
+                    <a href="#" id="nav-kegiatan"
+                       class="text-gray-500 hover:text-[#0D8B41] transition-colors">
+                        Kegiatan
+                    </a>
+                    <a href="#" id="nav-tentang"
+                       class="text-gray-500 hover:text-[#0D8B41] transition-colors">
+                        Tentang
+                    </a>
                 </div>
 
-                <!-- Auth CTA -->
-                <div class="flex items-center gap-3">
+                <!-- Right side -->
+                <div class="flex items-center gap-2">
                     @guest
-                        <a href="{{ route('login') }}" id="nav-login-btn" class="text-sm font-semibold text-gray-600 hover:text-[#0D8B41] transition-colors px-2">Masuk</a>
-                        <a href="{{ route('register') }}" id="nav-register-btn" class="bg-[#0D8B41] hover:bg-[#085c2b] text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all hover:shadow-lg hover:shadow-green-900/20 hover:-translate-y-0.5">
+                        <a href="{{ route('login') }}" id="nav-login-btn"
+                           class="text-sm font-semibold text-gray-600 hover:text-[#0D8B41] transition-colors px-3 py-1.5">
+                            Masuk
+                        </a>
+                        <a href="{{ route('register') }}" id="nav-register-btn"
+                           class="bg-[#0D8B41] hover:bg-[#085c2b] text-white text-sm font-semibold px-4 py-2 rounded-full transition-all hover:shadow-lg hover:shadow-green-900/20">
                             Daftar Gratis
                         </a>
                     @else
+                        {{-- Donasi --}}
+                        <a href="#" id="nav-donasi-link"
+                           class="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-[#0D8B41] transition-colors px-2 py-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                            Donasi
+                        </a>
+
+                        {{-- Riwayat --}}
+                        <a href="#" id="nav-riwayat-link"
+                           class="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-[#0D8B41] transition-colors px-2 py-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Riwayat
+                        </a>
+
                         {{-- User avatar + name --}}
-                        <a href="{{ route('dashboard') }}" id="nav-user-pill"
-                           class="flex items-center gap-2 bg-green-50 border border-green-100 rounded-full pl-1 pr-4 py-1 hover:bg-green-100 transition-colors">
+                        <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : (auth()->user()->role === 'petugas' ? route('petugas.dashboard') : route('dashboard')) }}" id="nav-user-pill"
+                           class="flex items-center gap-2 rounded-full px-2 py-1 hover:bg-gray-100 transition-colors ml-1">
                             <div class="w-7 h-7 rounded-full bg-[#0D8B41] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             </div>
                             <span class="text-sm font-semibold text-gray-700">{{ auth()->user()->name }}</span>
                         </a>
 
-                        {{-- Logout icon button --}}
+                        {{-- Logout icon --}}
                         <form method="POST" action="{{ route('logout') }}" class="inline">
                             @csrf
-                            <button type="submit" id="nav-logout-btn" title="Logout"
+                            <button type="submit" id="nav-logout-btn" title="Keluar"
                                     class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                                 </svg>
                             </button>
                         </form>
