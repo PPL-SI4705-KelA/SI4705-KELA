@@ -13,6 +13,7 @@ class ProfileController extends Controller
 {
     /**
      * Tampilkan halaman profil & pengaturan.
+     * Mengelola data diri, keamanan, dan preferensi akun.
      */
     public function edit(): View
     {
@@ -24,6 +25,7 @@ class ProfileController extends Controller
     /**
      * Update data profil (nama, email, phone).
      * Method: PATCH /profile
+     * Validasi menggunakan UpdateProfileRequest.
      */
     public function update(UpdateProfileRequest $request): RedirectResponse
     {
