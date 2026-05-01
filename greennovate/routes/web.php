@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\KegiatanController as AdminKegiatanController;
 use App\Http\Controllers\Petugas\PetugasDashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,21 +41,15 @@ Route::middleware(['auth', 'check.active'])->group(function () {
     });
 
     // ── Admin routes ───────────────────────────────────────────────────────────
-    // Hanya bisa diakses user dengan role 'admin'.
-    // Jika role lain mencoba → 403
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-        // Tambahkan route admin lainnya di sini, contoh:
-        // Route::resource('users', AdminUserController::class);
-        // Route::resource('kegiatan', AdminKegiatanController::class);
+
+        // GN-12: CRUD Kegiatan
+        Route::resource('kegiatan', AdminKegiatanController::class);
     });
 
     // ── Petugas routes ─────────────────────────────────────────────────────────
-    // Hanya bisa diakses user dengan role 'petugas'.
-    // Jika role lain mencoba → 403
     Route::prefix('petugas')->name('petugas.')->middleware('role:petugas')->group(function () {
         Route::get('/dashboard', [PetugasDashboardController::class, 'index'])->name('dashboard');
-        // Tambahkan route petugas lainnya di sini, contoh:
-        // Route::resource('donasi', PetugasDonasController::class);
     });
 });

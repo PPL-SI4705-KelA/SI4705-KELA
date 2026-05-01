@@ -75,6 +75,26 @@
         @endif
     </div>
 
+    {{-- Menu Cepat Admin --}}
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mt-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Menu Admin</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <a href="{{ route('admin.kegiatan.index') }}"
+               class="flex items-center gap-3 p-4 rounded-lg border border-green-200 bg-green-50 hover:bg-green-100 transition">
+                <div class="w-9 h-9 rounded-full bg-green-600 flex items-center justify-center text-white">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-green-800">Kelola Kegiatan</p>
+                    <p class="text-xs text-green-600">Tambah, ubah, hapus kegiatan</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
     <div class="mt-4 text-center">
         <form method="POST" action="{{ route('logout') }}">
             @csrf
