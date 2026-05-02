@@ -10,68 +10,49 @@ class Kegiatan extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $table = 'kegiatan';
+
     protected $fillable = [
         'nama',
-        'lokasi',
+        'lokasi_lahan_id',
+        'petugas_id',
         'tanggal',
-        'deskripsi',
-        'target',
-        'kuota',
+        'target_pohon',
+        'realisasi_pohon',
         'status',
+        'deskripsi',
     ];
 
     protected function casts(): array
     {
         return [
-            'tanggal' => 'date',
-            'target'  => 'integer',
-            'kuota'   => 'integer',
+            'tanggal'         => 'date',
+            'target_pohon'    => 'integer',
+            'realisasi_pohon' => 'integer',
         ];
     }
 
     // ── Relasi ────────────────────────────────────────────────────────────────
 
-    /**
-     * Kegiatan bisa punya banyak pendaftar (untuk sprint berikutnya).
-     * Relasi ini dipakai untuk mengecek apakah boleh dihapus.
-     */
-    // public function pendaftars()
-    // {
-    //     return $this->hasMany(Pendaftar::class);
-    // }
+    public function lokasLahan()
+    {
+        return $this->belongsTo(LokasLahan::class, 'lokasi_lahan_id');
+    }
+
+    public function petugas()
+    {
+        return $this->belongsTo(User::class, 'petugas_id');
+    }
 
     // ── Helper ────────────────────────────────────────────────────────────────
 
-    /**
-     * Cek apakah kegiatan ini sudah punya pendaftar.
-     * Saat ini belum ada tabel pendaftar, selalu false.
-     * Ganti implementasi saat tabel pendaftar sudah ada.
-     */
     public function hasPendaftar(): bool
     {
-        // return $this->pendaftars()->exists();
-        return false;
+        return in_array($this->status, ['Berlangsung', 'Selesai']);
     }
 
-    /**
-     * Apakah kegiatan masih aktif (bisa didaftari).
-     */
     public function isAktif(): bool
     {
-        return $this->status === 'aktif';
-    }
-
-    // ── Scopes ────────────────────────────────────────────────────────────────
-
-    /** Hanya kegiatan aktif. */
-    public function scopeAktif($query)
-    {
-        return $query->where('status', 'aktif');
-    }
-
-    /** Hanya kegiatan yang belum lewat tanggal. */
-    public function scopeMendatang($query)
-    {
-        return $query->where('tanggal', '>=', now()->toDateString());
+        return $this->status === 'Berlangsung';
     }
 }

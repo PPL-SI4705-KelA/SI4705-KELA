@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kegiatan;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class KegiatanController extends Controller
@@ -13,17 +15,14 @@ class KegiatanController extends Controller
     {
         Gate::authorize('viewAny', Kegiatan::class);
 
-        $query = Kegiatan::query();
+        $query = Kegiatan::with('petugas');
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('nama', 'like', '%' . $request->search . '%')
-                  ->orWhere('lokasi', 'like', '%' . $request->search . '%');
-            });
+            $query->where('nama', 'like', '%' . $request->search . '%');
         }
 
         $kegiatans = $query->latest()->paginate(10)->withQueryString();
@@ -35,7 +34,10 @@ class KegiatanController extends Controller
     {
         Gate::authorize('create', Kegiatan::class);
 
-        return view('admin.kegiatan.create');
+        $petugasList  = User::where('role', 'petugas')->get();
+        $lokasLahans  = DB::table('lokasi_lahans')->select('id', 'nama')->get();
+
+        return view('admin.kegiatan.create', compact('petugasList', 'lokasLahans'));
     }
 
     public function store(Request $request)
@@ -43,22 +45,26 @@ class KegiatanController extends Controller
         Gate::authorize('create', Kegiatan::class);
 
         $validated = $request->validate([
-            'nama'      => ['required', 'string', 'max:255'],
-            'lokasi'    => ['required', 'string', 'max:255'],
-            'tanggal'   => ['required', 'date', 'after_or_equal:today'],
-            'deskripsi' => ['nullable', 'string'],
-            'target'    => ['required', 'integer', 'min:0'],
-            'kuota'     => ['required', 'integer', 'min:0'],
-            'status'    => ['required', 'in:aktif,nonaktif,selesai'],
+            'nama'            => ['required', 'string', 'max:255'],
+            'lokasi_lahan_id' => ['required', 'integer', 'exists:lokasi_lahans,id'],
+            'petugas_id'      => ['required', 'integer', 'exists:users,id'],
+            'tanggal'         => ['required', 'date'],
+            'target_pohon'    => ['required', 'integer', 'min:0'],
+            'realisasi_pohon' => ['nullable', 'integer', 'min:0'],
+            'status'          => ['required', 'in:Persiapan,Berlangsung,Selesai,Dibatalkan'],
+            'deskripsi'       => ['nullable', 'string'],
         ], [
-            'nama.required'          => 'Nama kegiatan wajib diisi.',
-            'lokasi.required'        => 'Lokasi wajib diisi.',
-            'tanggal.required'       => 'Tanggal wajib diisi.',
-            'tanggal.after_or_equal' => 'Tanggal tidak boleh di masa lalu.',
-            'target.min'             => 'Target tidak boleh negatif.',
-            'kuota.min'              => 'Kuota tidak boleh negatif.',
-            'status.in'              => 'Status tidak valid.',
+            'nama.required'            => 'Nama kegiatan wajib diisi.',
+            'lokasi_lahan_id.required' => 'Lokasi lahan wajib dipilih.',
+            'lokasi_lahan_id.exists'   => 'Lokasi lahan tidak valid.',
+            'petugas_id.required'      => 'Petugas wajib dipilih.',
+            'petugas_id.exists'        => 'Petugas tidak valid.',
+            'tanggal.required'         => 'Tanggal wajib diisi.',
+            'target_pohon.min'         => 'Target pohon tidak boleh negatif.',
+            'realisasi_pohon.min'      => 'Realisasi pohon tidak boleh negatif.',
         ]);
+
+        $validated['realisasi_pohon'] = $validated['realisasi_pohon'] ?? 0;
 
         Kegiatan::create($validated);
 
@@ -70,7 +76,7 @@ class KegiatanController extends Controller
     public function show(Kegiatan $kegiatan)
     {
         Gate::authorize('view', $kegiatan);
-
+        $kegiatan->load('petugas', 'lokasLahan');
         return view('admin.kegiatan.show', compact('kegiatan'));
     }
 
@@ -78,7 +84,10 @@ class KegiatanController extends Controller
     {
         Gate::authorize('update', $kegiatan);
 
-        return view('admin.kegiatan.edit', compact('kegiatan'));
+        $petugasList = User::where('role', 'petugas')->get();
+        $lokasLahans = DB::table('lokasi_lahans')->select('id', 'nama')->get();
+
+        return view('admin.kegiatan.edit', compact('kegiatan', 'petugasList', 'lokasLahans'));
     }
 
     public function update(Request $request, Kegiatan $kegiatan)
@@ -86,20 +95,20 @@ class KegiatanController extends Controller
         Gate::authorize('update', $kegiatan);
 
         $validated = $request->validate([
-            'nama'      => ['required', 'string', 'max:255'],
-            'lokasi'    => ['required', 'string', 'max:255'],
-            'tanggal'   => ['required', 'date'],
-            'deskripsi' => ['nullable', 'string'],
-            'target'    => ['required', 'integer', 'min:0'],
-            'kuota'     => ['required', 'integer', 'min:0'],
-            'status'    => ['required', 'in:aktif,nonaktif,selesai'],
+            'nama'            => ['required', 'string', 'max:255'],
+            'lokasi_lahan_id' => ['required', 'integer', 'exists:lokasi_lahans,id'],
+            'petugas_id'      => ['required', 'integer', 'exists:users,id'],
+            'tanggal'         => ['required', 'date'],
+            'target_pohon'    => ['required', 'integer', 'min:0'],
+            'realisasi_pohon' => ['nullable', 'integer', 'min:0'],
+            'status'          => ['required', 'in:Persiapan,Berlangsung,Selesai,Dibatalkan'],
+            'deskripsi'       => ['nullable', 'string'],
         ], [
-            'nama.required'   => 'Nama kegiatan wajib diisi.',
-            'lokasi.required' => 'Lokasi wajib diisi.',
-            'tanggal.required'=> 'Tanggal wajib diisi.',
-            'target.min'      => 'Target tidak boleh negatif.',
-            'kuota.min'       => 'Kuota tidak boleh negatif.',
-            'status.in'       => 'Status tidak valid.',
+            'nama.required'            => 'Nama kegiatan wajib diisi.',
+            'lokasi_lahan_id.required' => 'Lokasi lahan wajib dipilih.',
+            'petugas_id.required'      => 'Petugas wajib dipilih.',
+            'tanggal.required'         => 'Tanggal wajib diisi.',
+            'target_pohon.min'         => 'Target pohon tidak boleh negatif.',
         ]);
 
         $kegiatan->update($validated);
@@ -114,7 +123,7 @@ class KegiatanController extends Controller
         if (Gate::denies('delete', $kegiatan)) {
             return redirect()
                 ->route('admin.kegiatan.index')
-                ->with('error', 'Kegiatan tidak dapat dihapus karena sudah memiliki pendaftar. Ubah status menjadi "Nonaktif".');
+                ->with('error', 'Kegiatan tidak dapat dihapus karena sudah Berlangsung/Selesai. Ubah status ke "Dibatalkan".');
         }
 
         $kegiatan->delete();
