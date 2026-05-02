@@ -16,9 +16,9 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $role = Auth::user()->role;
+        $user = Auth::user();
 
-        return match ($role) {
+        return match ($user->role) {
             'admin'   => redirect()->route('admin.dashboard'),
             'petugas' => redirect()->route('petugas.dashboard'),
             'user'    => view('user.dashboard'),

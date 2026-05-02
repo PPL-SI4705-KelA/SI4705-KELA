@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Petugas;
 
 use App\Http\Controllers\Controller;
+use App\Models\Kegiatan;
 use Illuminate\Http\Request;
 
 class PetugasDashboardController extends Controller
@@ -13,6 +14,12 @@ class PetugasDashboardController extends Controller
      */
     public function index()
     {
-        return view('petugas.dashboard');
+        // Ambil kegiatan aktif milik petugas yang sedang login
+        $kegiatans = Kegiatan::with('lokasiLahan')
+            ->where('petugas_id', auth()->id())
+            ->whereIn('status', ['Persiapan', 'Berlangsung'])
+            ->get();
+
+        return view('petugas.dashboard', compact('kegiatans'));
     }
 }

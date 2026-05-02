@@ -69,7 +69,15 @@ class LoginController extends Controller
             RateLimiter::clear($throttleKey);
             $request->session()->regenerate();
 
-            return redirect()->intended(route('dashboard'));
+            // Arahkan ke dashboard sesuai role
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            } elseif ($user->role === 'petugas') {
+                return redirect()->route('petugas.dashboard');
+            }
+
+            // User biasa diarahkan ke intended atau landing page
+            return redirect()->intended('/');
         }
 
         // Login gagal — tambah hit rate limiter

@@ -1,22 +1,92 @@
 <?php
 
-namespace App\Providers;
+namespace App\Models;
 
-use App\Models\Kegiatan;
-use App\Policies\KegiatanPolicy;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\ServiceProvider;
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
-class AppServiceProvider extends ServiceProvider
+class User extends Authenticatable
 {
-    public function register(): void
+    /** @use HasFactory<UserFactory> */
+    use HasFactory, Notifiable;
+
+    /**
+     * Konstanta role yang tersedia di sistem Greennovate.
+     */
+    const ROLE_USER    = 'user';
+    const ROLE_ADMIN   = 'admin';
+    const ROLE_PETUGAS = 'petugas';
+
+    /**
+     * Atribut yang dapat diisi melalui mass assignment.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'phone',
+        'password',
+        'role',
+        'is_active',
+        'city',
+    ];
+
+    /**
+     * Atribut yang disembunyikan saat serialisasi (misal: API response).
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Casting atribut ke tipe data yang sesuai.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
     {
-        //
+        return [
+            'email_verified_at' => 'datetime',
+            'password'          => 'hashed',
+            'is_active'         => 'boolean',
+        ];
     }
 
-    public function boot(): void
+    // -------------------------------------------------------
+    // Helper Methods untuk Role (Penting untuk Middleware)
+    // -------------------------------------------------------
+
+    /** Cek apakah user adalah Admin. */
+    public function isAdmin(): bool
     {
-        // Daftarkan Policy secara eksplisit (Laravel 11 tidak auto-discover di semua setup)
-        Gate::policy(Kegiatan::class, KegiatanPolicy::class);
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    /** Cek apakah user adalah Petugas. */
+    public function isPetugas(): bool
+    {
+        return $this->role === self::ROLE_PETUGAS;
+    }
+
+    /** Cek apakah user adalah User biasa. */
+    public function isUser(): bool
+    {
+        return $this->role === self::ROLE_USER;
+    }
+
+    /**
+     * Cek apakah user memiliki salah satu dari role yang diberikan.
+     * Berguna jika satu fitur bisa diakses beberapa role.
+     */
+    public function hasRole(array|string $roles): bool
+    {
+        return in_array($this->role, (array) $roles);
     }
 }

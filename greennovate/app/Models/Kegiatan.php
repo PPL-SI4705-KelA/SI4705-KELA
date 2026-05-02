@@ -34,9 +34,9 @@ class Kegiatan extends Model
 
     // ── Relasi ────────────────────────────────────────────────────────────────
 
-    public function lokasLahan()
+    public function lokasiLahan()
     {
-        return $this->belongsTo(LokasLahan::class, 'lokasi_lahan_id');
+        return $this->belongsTo(LokasiLahan::class, 'lokasi_lahan_id');
     }
 
     public function petugas()

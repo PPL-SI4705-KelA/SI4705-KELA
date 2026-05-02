@@ -22,9 +22,9 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'pardede281204@gmail.com'],
             [
-                'name'     => 'Admin Greennovate',
-                'password' => Hash::make('QWERTY12345'),
-                'role'     => User::ROLE_ADMIN,
+                'name'      => 'Admin Greennovate',
+                'password'  => Hash::make('QWERTY12345'),
+                'role'      => User::ROLE_ADMIN,
                 'is_active' => true,
             ]
         );
@@ -33,9 +33,9 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'petugas@greennovate.test'],
             [
-                'name'     => 'Petugas Greennovate',
-                'password' => Hash::make('petugas123'),
-                'role'     => User::ROLE_PETUGAS,
+                'name'      => 'Petugas Greennovate',
+                'password'  => Hash::make('petugas123'),
+                'role'      => User::ROLE_PETUGAS,
                 'is_active' => true,
             ]
         );
@@ -44,9 +44,9 @@ class DatabaseSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'user@greennovate.test'],
             [
-                'name'     => 'User Biasa',
-                'password' => Hash::make('user12345'),
-                'role'     => User::ROLE_USER,
+                'name'      => 'User Biasa',
+                'password'  => Hash::make('user12345'),
+                'role'      => User::ROLE_USER,
                 'is_active' => true,
             ]
         );

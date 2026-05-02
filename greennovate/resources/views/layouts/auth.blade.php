@@ -16,7 +16,7 @@
             <!-- Fallback Tailwind CSS script for rapid prototyping if Vite isn't running -->
             <script src="https://cdn.tailwindcss.com"></script>
         @endif
-        
+
         <style>
             body { font-family: 'Instrument Sans', sans-serif; }
         </style>
@@ -27,7 +27,7 @@
 
     <body class="bg-[#Fdfdfc] text-[#1b1b18] antialiased">
         <div class="min-h-screen flex flex-col pt-12 items-center">
-            
+
             <!-- Navbar Area -->
             <header class="w-full max-w-5xl px-6 flex justify-between items-center mb-16">
                 <a href="/" class="flex items-center gap-2">
@@ -48,6 +48,7 @@
 
                         <!-- Profile Dropdown (Menggunakan Alpine.js) -->
                         <div class="relative" x-data="{ open: false }">
+
                             <!-- Avatar -->
                             <button @click="open = !open"
                                 class="w-10 h-10 rounded-full bg-[#1b7b43] flex items-center justify-center text-white font-bold cursor-pointer focus:outline-none">
@@ -62,7 +63,7 @@
                                 x-transition:enter-end="opacity-100 scale-100"
                                 class="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
                                 style="display: none;">
-                                
+
                                 <!-- Info user -->
                                 <div class="px-4 py-2 border-b">
                                     <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->name }}</p>
@@ -70,7 +71,7 @@
                                 </div>
 
                                 <!-- Menu Links -->
-                                <a href="{{ route('profile.index') }}" 
+                                <a href="{{ route('profile.index') }}"
                                     class="block px-4 py-2 text-sm hover:bg-gray-100">
                                     Profil
                                 </a>
