@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -14,14 +13,15 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
-     * Konstanta role yang tersedia di sistem.
+     * Konstanta role yang tersedia di sistem Greennovate.
      */
     const ROLE_USER    = 'user';
     const ROLE_ADMIN   = 'admin';
     const ROLE_PETUGAS = 'petugas';
 
     /**
-     * The attributes that are mass assignable.
+     * Atribut yang dapat diisi melalui mass assignment.
+     * Sudah termasuk kolom 'city' yang sebelumnya konflik.
      *
      * @var list<string>
      */
@@ -36,7 +36,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Atribut yang disembunyikan saat serialisasi (misal: API response).
      *
      * @var list<string>
      */
@@ -46,7 +46,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * Casting atribut ke tipe data yang sesuai.
      *
      * @return array<string, string>
      */
@@ -60,8 +60,7 @@ class User extends Authenticatable
     }
 
     // -------------------------------------------------------
-    // Helper methods untuk pengecekan role
-    // Digunakan di: middleware, blade @if, unit test, dll.
+    // Helper Methods untuk Role (Penting untuk Middleware)
     // -------------------------------------------------------
 
     /** Cek apakah user adalah Admin. */
@@ -84,7 +83,7 @@ class User extends Authenticatable
 
     /**
      * Cek apakah user memiliki salah satu dari role yang diberikan.
-     * Contoh: $user->hasRole(['admin', 'petugas'])
+     * Berguna jika satu fitur bisa diakses beberapa role.
      */
     public function hasRole(array|string $roles): bool
     {
