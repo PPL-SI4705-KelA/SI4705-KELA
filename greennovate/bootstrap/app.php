@@ -11,6 +11,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->redirectUsersTo(function () {
+            if (auth()->check()) {
+                if (auth()->user()->role === 'admin') {
+                    return route('admin.dashboard');
+                } elseif (auth()->user()->role === 'petugas') {
+                    return route('petugas.dashboard');
+                }
+            }
+            return '/';
+        });
+
         $middleware->alias([
             'check.active' => \App\Http\Middleware\CheckActive::class,
             'is.admin'     => \App\Http\Middleware\IsAdmin::class,

@@ -148,6 +148,13 @@
                        class="text-gray-500 hover:text-[#0D8B41] transition-colors">
                         Tentang
                     </a>
+                    @auth
+                        @if(auth()->user()->role === 'admin')
+                            <a href="{{ route('admin.dashboard') }}" class="text-gray-500 hover:text-[#0D8B41] transition-colors font-medium">Dashboard Admin</a>
+                        @elseif(auth()->user()->role === 'petugas')
+                            <a href="{{ route('petugas.dashboard') }}" class="text-gray-500 hover:text-[#0D8B41] transition-colors font-medium">Dashboard Petugas</a>
+                        @endif
+                    @endauth
                 </div>
 
                 <!-- Right side -->
