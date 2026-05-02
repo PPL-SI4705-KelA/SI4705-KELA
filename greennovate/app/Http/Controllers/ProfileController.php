@@ -2,67 +2,88 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\UpdatePasswordRequest;
+use App\Http\Requests\UpdatePreferencesRequest;
+use App\Http\Requests\UpdateProfileRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    public function index()
+    /**
+     * Tampilkan halaman profil & pengaturan.
+     * Mengelola data diri, keamanan, dan preferensi akun.
+     */
+    public function edit(): View
     {
-        return view('profile.index');
-    }
-
-    public function edit()
-    {
-        return view('profile.edit');
-    }
-
-    public function update(Request $request)
-    {
-        
-        $request->validate([
-            'name'  => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'nullable|string|max:20',
-            'city'  => 'nullable|string|max:100',
-        ]);    
-    
-        $user = Auth::user();
-
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'city'  => $request->city,
+        return view('profile.edit', [
+            'user' => Auth::user(),
         ]);
-
-        return redirect()->route('profile.index')
-            ->with('success', 'Profil berhasil diupdate');
     }
 
-    public function showChangePasswordForm()
+    /**
+     * Update data profil (nama, email, phone).
+     * Method: PATCH /profile
+     * Validasi menggunakan UpdateProfileRequest.
+     */
+    public function update(UpdateProfileRequest $request): RedirectResponse
     {
-        return view('profile.change-password'); 
-    }
+        $user = $request->user();
+        $validated = $request->validated();
 
-    public function updatePassword(Request $request)
-    {
-        $request->validate([
-                'old_password' => 'required',
-                'new_password' => 'required|min:6|confirmed',
-            ]);    
+        $user->fill($validated);
 
-        $user = Auth::user();
-
-        if (!Hash::check($request->old_password, $user->password)) {
-            return back()->with('error', 'Password lama salah');
+        // Reset email_verified_at jika email berubah
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $user->update([
-            'password' => Hash::make($request->new_password)
+        $user->save();
+
+        return redirect()
+            ->route('profile.edit')
+            ->with('success', __('Profile updated successfully.'));
+    }
+
+    /**
+     * Update password pengguna.
+     * Method: PUT /profile/password
+     * Security: Validasi current_password sebelum update.
+     */
+    public function updatePassword(UpdatePasswordRequest $request): RedirectResponse
+    {
+        $request->user()->update([
+            'password' => $request->validated('password'),
         ]);
 
-        return back()->with('success', 'Password berhasil diubah');
+        return redirect()
+            ->route('profile.edit')
+            ->with('success', __('Password changed successfully.'));
+    }
+
+    /**
+     * Update preferensi (bahasa & notifikasi).
+     * Method: PATCH /profile/preferences
+     */
+    public function updatePreferences(UpdatePreferencesRequest $request): RedirectResponse
+    {
+        $user = $request->user();
+        $validated = $request->validated();
+
+        // Checkbox yang tidak dicentang tidak dikirim, jadi set default false
+        $user->update([
+            'locale' => $validated['locale'],
+            'notif_email' => $request->boolean('notif_email'),
+            'notif_push' => $request->boolean('notif_push'),
+        ]);
+
+        // Set locale session agar langsung berlaku
+        session(['locale' => $validated['locale']]);
+        app()->setLocale($validated['locale']);
+
+        return redirect()
+            ->route('profile.edit')
+            ->with('success', __('Preferences updated successfully.'));
     }
 }

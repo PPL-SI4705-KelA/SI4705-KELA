@@ -25,15 +25,15 @@ class RegisterController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'login'    => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
+            'login' => ['required', 'string', 'max:255'],
             'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
         ], [
-            'name.required'      => 'Nama wajib diisi.',
-            'login.required'     => 'Email atau No HP wajib diisi.',
-            'password.required'  => 'Password wajib diisi.',
+            'name.required' => 'Nama wajib diisi.',
+            'login.required' => 'Email atau No HP wajib diisi.',
+            'password.required' => 'Password wajib diisi.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
-            'password.min'       => 'Password minimal 8 karakter.',
+            'password.min' => 'Password minimal 8 karakter.',
         ]);
 
         $loginValue = $request->input('login');
@@ -49,8 +49,8 @@ class RegisterController extends Controller
             ]);
 
             $userData = [
-                'name'     => $request->name,
-                'email'    => $loginValue,
+                'name' => $request->name,
+                'email' => $loginValue,
                 'password' => $request->password,
             ];
         } else {
@@ -63,8 +63,8 @@ class RegisterController extends Controller
             ]);
 
             $userData = [
-                'name'     => $request->name,
-                'phone'    => $loginValue,
+                'name' => $request->name,
+                'phone' => $loginValue,
                 'password' => $request->password,
             ];
         }

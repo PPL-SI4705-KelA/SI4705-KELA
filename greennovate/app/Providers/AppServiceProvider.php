@@ -16,8 +16,8 @@ class User extends Authenticatable
     /**
      * Konstanta role yang tersedia di sistem Greennovate.
      */
-    const ROLE_USER    = 'user';
-    const ROLE_ADMIN   = 'admin';
+    const ROLE_USER = 'user';
+    const ROLE_ADMIN = 'admin';
     const ROLE_PETUGAS = 'petugas';
 
     /**
@@ -54,8 +54,8 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
-            'is_active'         => 'boolean',
+            'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 

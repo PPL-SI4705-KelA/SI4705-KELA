@@ -25,10 +25,10 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'login'    => ['required', 'string'],
+            'login' => ['required', 'string'],
             'password' => ['required', 'string'],
         ], [
-            'login.required'    => 'Email atau No HP wajib diisi.',
+            'login.required' => 'Email atau No HP wajib diisi.',
             'password.required' => 'Password wajib diisi.',
         ]);
 
@@ -48,7 +48,7 @@ class LoginController extends Controller
         $field = filter_var($loginValue, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
 
         $credentials = [
-            $field     => $loginValue,
+            $field => $loginValue,
             'password' => $request->password,
         ];
 
@@ -56,7 +56,7 @@ class LoginController extends Controller
             $user = Auth::user();
 
             // Cek status aktif akun
-            if (! $user->is_active) {
+            if (!$user->is_active) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();

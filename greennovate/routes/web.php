@@ -31,14 +31,11 @@ Route::middleware(['auth', 'check.active'])->group(function () {
     // Dispatcher: Mengarahkan user ke dashboard sesuai role masing-masing
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // ── Profile (Bisa diakses Admin, Petugas, dan User) ──────────────────────
-    Route::prefix('profile')->name('profile.')->group(function () {
-        Route::get('/',         [ProfileController::class, 'index'])->name('index');
-        Route::get('/edit',     [ProfileController::class, 'edit'])->name('edit');
-        Route::post('/update',  [ProfileController::class, 'update'])->name('update');
-        Route::get('/password', [ProfileController::class, 'showChangePasswordForm'])->name('password.form');
-        Route::post('/password',[ProfileController::class, 'updatePassword'])->name('password.update');
-    });
+    // Profile & Settings
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::patch('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences');
 
     // ── Admin routes ──────────────────────────────────────────────────────────
     Route::middleware('is.admin')

@@ -33,6 +33,9 @@ class User extends Authenticatable
         'role',
         'is_active',
         'city',
+        'locale',
+        'notif_email',
+        'notif_push',
     ];
 
     /**
@@ -56,6 +59,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
             'is_active'         => 'boolean',
+            'notif_email'       => 'boolean',
+            'notif_push'        => 'boolean',
         ];
     }
 
