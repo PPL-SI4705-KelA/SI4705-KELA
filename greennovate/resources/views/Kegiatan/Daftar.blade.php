@@ -61,7 +61,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('kegiatan.daftar', $kegiatan->slug ?? $kegiatan->id) }}">
+        <form id="formDaftar" method="POST" action="{{ route('kegiatan.daftar', $kegiatan->slug ?? $kegiatan->id) }}">
             @csrf
 
             {{-- Nama Lengkap --}}
@@ -129,7 +129,7 @@
 
             {{-- Tombol --}}
             <div class="flex items-center gap-3">
-                <button type="submit"
+                <button type="button" onclick="openModal()"
                         class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200 text-sm">
                     Kirim Pendaftaran
                 </button>
@@ -143,4 +143,84 @@
     </div>
 
 </div>
+
+<script>
+    function openModal() {
+        document.getElementById('confirmModal').classList.remove('hidden');
+        document.getElementById('confirmModal').classList.add('flex');
+    }
+
+    function closeModal() {
+        document.getElementById('confirmModal').classList.add('hidden');
+    }
+
+    function confirmSubmit() {
+        const form = document.getElementById('formDaftar');
+
+        if (form) {
+            form.requestSubmit(); // 🔥 ini kunci fix logout
+        }
+    }
+
+    function closeModal() {
+    const modal = document.getElementById('confirmModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    }
+</script>
+
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+.animate-fadeIn {
+    animation: fadeIn 0.25s ease-out;
+}
+</style>
+
+<div id="confirmModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50">
+    <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl animate-fadeIn">
+
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">
+            Konfirmasi Pendaftaran
+        </h2>
+
+        <p class="text-sm text-gray-600 mb-4">
+            Apakah Anda yakin ingin mendaftar untuk kegiatan 
+            <span class="font-semibold text-gray-800">{{ $kegiatan->nama }}</span>?
+        </p>
+
+        <div class="text-sm text-gray-600 mb-4">
+            <p class="font-medium mb-2">Hal yang perlu dipersiapkan:</p>
+            <ul class="list-disc list-inside space-y-1">
+                <li>Pakaian lapangan yang nyaman & sepatu tertutup</li>
+                <li>Topi, tabir surya & perlengkapan anti panas</li>
+                <li>Botol minum pribadi (min. 1 liter)</li>
+                <li>Sarung tangan kerja / berkebun</li>
+                <li>Jas hujan atau ponco (antisipasi cuaca)</li>
+                <li>Obat-obatan pribadi & P3K dasar</li>
+                <li>Identitas diri (KTP/KTM)</li>
+            </ul>
+        </div>
+
+        <div class="text-xs text-gray-500 mb-5">
+            📍 Lokasi: {{ $kegiatan->lokasiLahan?->nama ?? '-' }} <br>
+            📅 Tanggal: {{ $kegiatan->tanggal?->translatedFormat('l, d F Y') ?? '-' }}
+        </div>
+
+        <div class="flex gap-3">
+            <button onclick="closeModal()"
+                    class="flex-1 border border-gray-200 text-gray-500 py-2.5 rounded-lg">
+                Batal
+            </button>
+
+            <button type="button" onclick="confirmSubmit()"
+                    class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg">
+                Ya, Saya Yakin
+            </button>
+        </div>
+    </div>
+</div>
+
 @endsection
