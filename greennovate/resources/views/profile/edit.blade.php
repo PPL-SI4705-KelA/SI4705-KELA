@@ -19,6 +19,39 @@
         <p class="text-gray-500 mt-1">{{ __('Manage your personal information, security, and preferences') }}</p>
     </div>
 
+    {{-- Profile Hero Card --}}
+    <div class="mb-6 bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-[#1b7b43] to-emerald-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg ring-4 ring-green-100 flex-shrink-0">
+                {{ strtoupper(substr($user->name, 0, 1)) }}
+            </div>
+            <div class="flex-1 text-center sm:text-left">
+                <h2 class="text-2xl font-bold text-gray-900">{{ $user->name }}</h2>
+                <p class="text-gray-500 text-sm mt-0.5">{{ $user->email }}</p>
+                <div class="flex flex-wrap justify-center sm:justify-start gap-2 mt-3">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold {{ $user->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                        <span class="w-1.5 h-1.5 rounded-full {{ $user->is_active ? 'bg-green-500' : 'bg-red-500' }}"></span>
+                        {{ $user->is_active ? __('Active') : __('Inactive') }}
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        {{ __('role_' . $user->role) }}
+                    </span>
+                    @if($user->city)
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        {{ $user->city }}
+                    </span>
+                    @endif
+                </div>
+            </div>
+            <div class="text-center sm:text-right text-xs text-gray-400 flex-shrink-0">
+                <p>{{ __('Member Since') }}</p>
+                <p class="font-semibold text-gray-600">{{ $user->created_at->format('d M Y') }}</p>
+            </div>
+        </div>
+    </div>
+
     {{-- Success Toast --}}
     @if(session('success'))
         <div id="success-toast" class="mb-6 flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border border-green-200 shadow-sm animate-slide-in">
@@ -124,6 +157,21 @@
                     @enderror
                 </div>
 
+                {{-- City --}}
+                <div>
+                    <label for="city" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('City') }}</label>
+                    <input id="city" type="text" name="city" value="{{ old('city', $user->city) }}"
+                        placeholder="{{ __('Enter your city') }}"
+                        class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-green-500/20 focus:border-green-500 outline-none transition text-sm
+                        {{ $errors->has('city') ? 'border-red-400 bg-red-50/50' : 'border-gray-300' }}">
+                    @error('city')
+                        <p class="mt-1.5 text-xs text-red-500 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01" /></svg>
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+
                 <div class="pt-2">
                     <button type="submit" class="inline-flex items-center gap-2 bg-gradient-to-r from-[#1b7b43] to-[#15633a] text-white font-medium px-6 py-2.5 rounded-xl hover:from-green-700 hover:to-green-800 transition-all shadow-sm hover:shadow-md transform hover:-translate-y-0.5">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -133,6 +181,36 @@
                     </button>
                 </div>
             </form>
+
+            {{-- Account Information --}}
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <h3 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <svg class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    {{ __('Account Information') }}
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                        <p class="text-xs text-gray-500 mb-1">{{ __('Role') }}</p>
+                        <p class="text-sm font-semibold text-gray-900">{{ __('role_' . $user->role) }}</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                        <p class="text-xs text-gray-500 mb-1">{{ __('Member Since') }}</p>
+                        <p class="text-sm font-semibold text-gray-900">{{ $user->created_at->format('d M Y') }}</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
+                        <p class="text-xs text-gray-500 mb-1">{{ __('Email Status') }}</p>
+                        <p class="text-sm font-semibold flex items-center gap-1.5 {{ $user->email_verified_at ? 'text-green-700' : 'text-amber-600' }}">
+                            @if($user->email_verified_at)
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                {{ __('Verified') }}
+                            @else
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                {{ __('Not Verified') }}
+                            @endif
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         {{-- ============================================== --}}
@@ -229,6 +307,26 @@
                     </button>
                 </div>
             </form>
+
+            {{-- Danger Zone --}}
+            <div class="mt-8 pt-6 border-t border-red-200">
+                <h3 class="text-sm font-semibold text-red-700 mb-2 flex items-center gap-2">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    {{ __('Danger Zone') }}
+                </h3>
+                <div class="p-4 rounded-xl border border-red-200 bg-red-50/50">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div>
+                            <p class="text-sm font-medium text-red-800">{{ __('Delete Account') }}</p>
+                            <p class="text-xs text-red-600 mt-0.5">{{ __('Once you delete your account, all data will be permanently removed. This action cannot be undone.') }}</p>
+                        </div>
+                        <button type="button" onclick="document.getElementById('delete-modal').classList.remove('hidden')" class="inline-flex items-center gap-2 bg-red-600 text-white font-medium px-4 py-2 rounded-xl hover:bg-red-700 transition-all text-sm flex-shrink-0">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            {{ __('Delete Account') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         {{-- ============================================== --}}
@@ -351,6 +449,42 @@
             </form>
         </div>
 
+    </div>
+</div>
+
+{{-- Delete Account Modal --}}
+<div id="delete-modal" class="{{ $errors->userDeletion->isNotEmpty() ? '' : 'hidden' }} fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('delete-modal').classList.add('hidden')"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-slide-in">
+        <div class="text-center mb-4">
+            <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <svg class="h-7 w-7 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900">{{ __('Delete Account') }}</h3>
+            <p class="text-sm text-gray-500 mt-1">{{ __('Once you delete your account, all data will be permanently removed. This action cannot be undone.') }}</p>
+        </div>
+        <form method="POST" action="{{ route('profile.destroy') }}">
+            @csrf
+            @method('DELETE')
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('Enter your password to confirm') }}</label>
+                <input type="password" name="password" required class="w-full px-4 py-2.5 border {{ $errors->userDeletion->has('password') ? 'border-red-500 bg-red-50/50' : 'border-gray-300' }} rounded-xl focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none transition text-sm" placeholder="••••••••">
+                @if ($errors->userDeletion->has('password'))
+                    <p class="mt-1.5 text-xs text-red-500 flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01" /></svg>
+                        {{ $errors->userDeletion->first('password') }}
+                    </p>
+                @endif
+            </div>
+            <div class="flex gap-3">
+                <button type="button" onclick="document.getElementById('delete-modal').classList.add('hidden')" class="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                    {{ __('Cancel') }}
+                </button>
+                <button type="submit" class="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition">
+                    {{ __('I understand, delete my account') }}
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
