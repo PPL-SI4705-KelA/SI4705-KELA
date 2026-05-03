@@ -86,4 +86,25 @@ class ProfileController extends Controller
             ->route('profile.edit')
             ->with('success', __('Preferences updated successfully.'));
     }
+
+    /**
+     * Delete the user's account.
+     */
+    public function destroy(\Illuminate\Http\Request $request): RedirectResponse
+    {
+        $request->validateWithBag('userDeletion', [
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $user = $request->user();
+
+        Auth::logout();
+
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/')->with('success', __('Account deleted successfully.'));
+    }
 }

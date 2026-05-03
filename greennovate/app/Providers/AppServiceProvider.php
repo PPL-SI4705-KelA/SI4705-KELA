@@ -1,92 +1,24 @@
 <?php
 
-namespace App\Models;
+namespace App\Providers;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\ServiceProvider;
 
-class User extends Authenticatable
+class AppServiceProvider extends ServiceProvider
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
-
     /**
-     * Konstanta role yang tersedia di sistem Greennovate.
+     * Register any application services.
      */
-    const ROLE_USER = 'user';
-    const ROLE_ADMIN = 'admin';
-    const ROLE_PETUGAS = 'petugas';
-
-    /**
-     * Atribut yang dapat diisi melalui mass assignment.
-     *
-     * @var list<string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'phone',
-        'password',
-        'role',
-        'is_active',
-        'city',
-    ];
-
-    /**
-     * Atribut yang disembunyikan saat serialisasi (misal: API response).
-     *
-     * @var list<string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * Casting atribut ke tipe data yang sesuai.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    public function register(): void
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'is_active' => 'boolean',
-        ];
-    }
-
-    // -------------------------------------------------------
-    // Helper Methods untuk Role (Penting untuk Middleware)
-    // -------------------------------------------------------
-
-    /** Cek apakah user adalah Admin. */
-    public function isAdmin(): bool
-    {
-        return $this->role === self::ROLE_ADMIN;
-    }
-
-    /** Cek apakah user adalah Petugas. */
-    public function isPetugas(): bool
-    {
-        return $this->role === self::ROLE_PETUGAS;
-    }
-
-    /** Cek apakah user adalah User biasa. */
-    public function isUser(): bool
-    {
-        return $this->role === self::ROLE_USER;
+        //
     }
 
     /**
-     * Cek apakah user memiliki salah satu dari role yang diberikan.
-     * Berguna jika satu fitur bisa diakses beberapa role.
+     * Bootstrap any application services.
      */
-    public function hasRole(array|string $roles): bool
+    public function boot(): void
     {
-        return in_array($this->role, (array) $roles);
+        // Tambahkan konfigurasi global di sini jika diperlukan
     }
 }
