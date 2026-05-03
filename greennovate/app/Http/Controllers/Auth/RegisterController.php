@@ -25,30 +25,46 @@ class RegisterController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'login'    => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
+            'login' => ['required', 'string', 'max:255'],
             'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
         ], [
-            'name.required'     => 'Nama wajib diisi.',
-            'login.required'    => 'Email atau No HP wajib diisi.',
+            'name.required' => 'Nama wajib diisi.',
+            'login.required' => 'Email atau No HP wajib diisi.',
             'password.required' => 'Password wajib diisi.',
-            'password.confirmed'=> 'Konfirmasi password tidak cocok.',
-            'password.min'      => 'Password minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'password.min' => 'Password minimal 8 karakter.',
         ]);
 
         $loginValue = $request->input('login');
 
         // Tentukan apakah input adalah email atau nomor HP
         if (filter_var($loginValue, FILTER_VALIDATE_EMAIL)) {
+
+            // Validasi unik email
+            $request->validate([
+                'login' => ['unique:users,email'],
+            ], [
+                'login.unique' => 'Email ini sudah terdaftar. Silakan gunakan email lain atau masuk.',
+            ]);
+
             $userData = [
-                'name'     => $request->name,
-                'email'    => $loginValue,
+                'name' => $request->name,
+                'email' => $loginValue,
                 'password' => $request->password,
             ];
         } else {
+
+            // Validasi unik nomor HP
+            $request->validate([
+                'login' => ['unique:users,phone'],
+            ], [
+                'login.unique' => 'Nomor HP ini sudah terdaftar. Silakan gunakan nomor lain atau masuk.',
+            ]);
+
             $userData = [
-                'name'     => $request->name,
-                'phone'    => $loginValue,
+                'name' => $request->name,
+                'phone' => $loginValue,
                 'password' => $request->password,
             ];
         }
@@ -58,6 +74,12 @@ class RegisterController extends Controller
         // Login otomatis setelah registrasi
         Auth::login($user);
 
-        return redirect()->route('dashboard')->with('success', 'Selamat datang di Greennovate!');
+        // Admin diarahkan ke dashboard admin
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard')->with('success', 'Selamat datang, Admin!');
+        }
+
+        // User biasa diarahkan ke landing page
+        return redirect('/')->with('success', 'Selamat datang di Greennovate!');
     }
 }

@@ -14,21 +14,14 @@ return new class extends Migration
         Schema::create('kegiatan', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->string('lokasi');
+            $table->foreignId('lokasi_lahan_id')->constrained('lokasi_lahans')->onDelete('cascade');
+            $table->foreignId('petugas_id')->constrained('users')->onDelete('cascade'); // The officer assigned
             $table->date('tanggal');
             $table->integer('target_pohon');
-            $table->integer('kuota_total');
-            $table->integer('kuota_terisi')->default(0);
+            $table->integer('realisasi_pohon')->default(0);
+            $table->enum('status', ['Persiapan', 'Berlangsung', 'Selesai', 'Dibatalkan'])->default('Persiapan');
             $table->text('deskripsi')->nullable();
-            $table->enum('status', ['aktif', 'penuh', 'selesai'])->default('aktif');
             $table->timestamps();
-
-            // PBI-54: Index untuk kolom yang sering difilter (tanggal, lokasi, status)
-            $table->index('tanggal');
-            $table->index('lokasi');
-            $table->index('status');
-            // Composite index untuk query filter gabungan
-            $table->index(['status', 'tanggal']);
         });
     }
 
