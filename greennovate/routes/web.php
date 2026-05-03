@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\LokasiLahanController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Petugas\PetugasDashboardController;
 use App\Http\Controllers\ProfileController;
@@ -31,7 +32,13 @@ Route::middleware(['auth', 'check.active'])->group(function () {
     // Dispatcher: Mengarahkan user ke dashboard sesuai role masing-masing
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Profile & Settings
+    // ── Kegiatan (user) ───────────────────────────────────────────────────────
+    Route::get('/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
+    Route::get('/kegiatan/{slug}', [KegiatanController::class, 'show'])->name('kegiatan.show');
+    Route::get('/kegiatan/{slug}/daftar', [KegiatanController::class, 'showDaftarForm'])->name('kegiatan.daftar.form');
+    Route::post('/kegiatan/{slug}/daftar', [KegiatanController::class, 'daftar'])->name('kegiatan.daftar');
+
+    // ── Profile & Settings ────────────────────────────────────────────────────
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');

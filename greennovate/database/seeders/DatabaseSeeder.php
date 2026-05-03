@@ -53,5 +53,10 @@ class DatabaseSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+
+        // ── Seeder tambahan ────────────────────────────────────────────────────
+        $this->call([
+            KegiatanSeeder::class,
+        ]);
     }
 }
