@@ -4,125 +4,153 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 
 class Kegiatan extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'kegiatan';
 
     protected $fillable = [
-        'title',
+        'nama',
         'slug',
-        'description',
-        'location',
+        'lokasi_lahan_id',
+        'petugas_id',
+        'tanggal',
+        'target_pohon',
+        'realisasi_pohon',
         'quota',
         'registered_count',
+        'status',
+        'deskripsi',
         'terms',
         'image',
-        'start_date',
-        'end_date',
         'registration_open_at',
         'registration_close_at',
-        'status',
     ];
 
     protected $casts = [
-        'start_date'             => 'datetime',
-        'end_date'               => 'datetime',
-        'registration_open_at'   => 'datetime',
-        'registration_close_at'  => 'datetime',
+        'tanggal'               => 'datetime',
+        'registration_open_at'  => 'datetime',
+        'registration_close_at' => 'datetime',
+        'target_pohon'          => 'integer',
+        'realisasi_pohon'       => 'integer',
+        'quota'                 => 'integer',
+        'registered_count'      => 'integer',
     ];
 
-    /**
-     * Cek apakah pendaftaran masih bisa dilakukan.
-     * Pendaftaran terbuka jika:
-     *  - Status masih 'open'
-     *  - Sekarang berada dalam rentang registration_open_at – registration_close_at
-     *  - Kuota belum penuh
-     */
+    // ── Relasi ──────────────────────────────────────────────────────────────
+
+    public function lokasiLahan()
+    {
+        return $this->belongsTo(LokasiLahan::class, 'lokasi_lahan_id');
+    }
+
+    public function petugas()
+    {
+        return $this->belongsTo(User::class, 'petugas_id');
+    }
+
+    // ── Helper ──────────────────────────────────────────────────────────────
+
+    public function hasPendaftar(): bool
+    {
+        return in_array($this->status, ['Berlangsung', 'Selesai']);
+    }
+
+    public function isAktif(): bool
+    {
+        return $this->status === 'Berlangsung';
+    }
+
     public function isRegistrationOpen(): bool
     {
         $now = Carbon::now();
 
-        return $this->status === 'open'
-            && $now->greaterThanOrEqualTo($this->registration_open_at)
-            && $now->lessThanOrEqualTo($this->registration_close_at)
-            && $this->registered_count < $this->quota;
+        if ($this->status !== 'Berlangsung') {
+            return false;
+        }
+
+        if ($this->registration_open_at && $now->lessThan($this->registration_open_at)) {
+            return false;
+        }
+
+        if ($this->registration_close_at && $now->greaterThan($this->registration_close_at)) {
+            return false;
+        }
+
+        if ($this->quota > 0 && $this->registered_count >= $this->quota) {
+            return false;
+        }
+
+        return true;
     }
 
-    /**
-     * Persentase kuota terisi (0–100).
-     */
     public function progressPercentage(): int
     {
         if ($this->quota <= 0) {
-            return 100;
+            return 0;
         }
 
         return (int) min(100, round(($this->registered_count / $this->quota) * 100));
     }
 
-    /**
-     * Label status untuk tampilan.
-     */
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
-            'open'      => 'Pendaftaran Dibuka',
-            'closed'    => 'Pendaftaran Ditutup',
-            'completed' => 'Kegiatan Selesai',
-            default     => 'Tidak Diketahui',
+            'Persiapan'   => 'Persiapan',
+            'Berlangsung' => 'Berlangsung',
+            'Selesai'     => 'Selesai',
+            'Dibatalkan'  => 'Dibatalkan',
+            default       => $this->status ?? 'Tidak Diketahui',
         };
     }
 
-    /**
-     * Warna badge status.
-     */
     public function getStatusColorAttribute(): string
     {
         return match ($this->status) {
-            'open'      => 'green',
-            'closed'    => 'red',
-            'completed' => 'gray',
-            default     => 'gray',
+            'Persiapan'   => 'yellow',
+            'Berlangsung' => 'green',
+            'Selesai'     => 'gray',
+            'Dibatalkan'  => 'red',
+            default       => 'gray',
         };
     }
 
-    /**
-     * Alasan tombol daftar dinonaktifkan (null = bisa mendaftar).
-     */
     public function getRegistrationDisabledReasonAttribute(): ?string
     {
         $now = Carbon::now();
 
-        if ($this->status === 'completed') {
+        if ($this->status === 'Persiapan') {
+            return 'Kegiatan ini belum dibuka untuk pendaftaran.';
+        }
+
+        if ($this->status === 'Selesai') {
             return 'Kegiatan ini telah selesai dilaksanakan.';
         }
 
-        if ($this->status === 'closed') {
-            return 'Pendaftaran untuk kegiatan ini telah ditutup.';
+        if ($this->status === 'Dibatalkan') {
+            return 'Kegiatan ini telah dibatalkan.';
         }
 
-        if ($now->lessThan($this->registration_open_at)) {
-            return 'Pendaftaran belum dibuka. Dibuka pada ' . $this->registration_open_at->translatedFormat('d F Y, H:i') . ' WIB.';
+        if ($this->registration_open_at && $now->lessThan($this->registration_open_at)) {
+            return 'Pendaftaran belum dibuka. Dibuka pada '
+                . $this->registration_open_at->translatedFormat('d F Y, H:i') . ' WIB.';
         }
 
-        if ($now->greaterThan($this->registration_close_at)) {
+        if ($this->registration_close_at && $now->greaterThan($this->registration_close_at)) {
             return 'Batas waktu pendaftaran telah berakhir.';
         }
 
-        if ($this->registered_count >= $this->quota) {
+        if ($this->quota > 0 && $this->registered_count >= $this->quota) {
             return 'Kuota peserta sudah penuh.';
         }
 
         return null;
     }
 
-    /**
-     * Sisa kuota peserta.
-     */
     public function getRemainingQuotaAttribute(): int
     {
         return max(0, $this->quota - $this->registered_count);

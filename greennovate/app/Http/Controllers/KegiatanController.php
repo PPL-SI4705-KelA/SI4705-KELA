@@ -13,14 +13,13 @@ class KegiatanController extends Controller
      */
     public function index()
     {
-        $kegiatan = Kegiatan::orderBy('start_date', 'asc')->get();
+        $kegiatan = Kegiatan::orderBy('tanggal', 'asc')->get();
 
         return view('kegiatan.index', compact('kegiatan'));
     }
 
     /**
      * Tampilkan detail satu kegiatan berdasarkan slug.
-     * Jika tidak ditemukan, tampilkan halaman 404.
      */
     public function show(string $slug)
     {
@@ -44,11 +43,10 @@ class KegiatanController extends Controller
             abort(404);
         }
 
-        // Jika pendaftaran tidak bisa dilakukan, redirect kembali ke detail
         if (!$kegiatan->isRegistrationOpen()) {
             return redirect()
                 ->route('kegiatan.show', $slug)
-                ->with('error', 'Pendaftaran untuk kegiatan ini tidak tersedia: ' . $kegiatan->registration_disabled_reason);
+                ->with('error', 'Pendaftaran tidak tersedia: ' . $kegiatan->registration_disabled_reason);
         }
 
         $user = Auth::user();
@@ -74,23 +72,21 @@ class KegiatanController extends Controller
         }
 
         $request->validate([
-            'nama_lengkap'   => 'required|string|max:255',
-            'no_hp'          => 'required|string|max:20',
-            'alamat'         => 'required|string|max:500',
-            'pernyataan'     => 'accepted',
+            'nama_lengkap' => 'required|string|max:255',
+            'no_hp'        => 'required|string|max:20',
+            'alamat'       => 'required|string|max:500',
+            'pernyataan'   => 'accepted',
         ], [
-            'nama_lengkap.required'  => 'Nama lengkap wajib diisi.',
-            'no_hp.required'         => 'Nomor HP wajib diisi.',
-            'alamat.required'        => 'Alamat wajib diisi.',
-            'pernyataan.accepted'    => 'Anda harus menyetujui ketentuan yang berlaku.',
+            'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+            'no_hp.required'        => 'Nomor HP wajib diisi.',
+            'alamat.required'       => 'Alamat wajib diisi.',
+            'pernyataan.accepted'   => 'Anda harus menyetujui ketentuan yang berlaku.',
         ]);
 
-        // Increment registered_count
         $kegiatan->increment('registered_count');
 
         return redirect()
             ->route('kegiatan.show', $slug)
-            ->with('success', 'Pendaftaran berhasil! Anda telah terdaftar untuk kegiatan "' . $kegiatan->title . '".');
+            ->with('success', 'Pendaftaran berhasil! Anda telah terdaftar untuk kegiatan "' . $kegiatan->nama . '".');
     }
 }
-
