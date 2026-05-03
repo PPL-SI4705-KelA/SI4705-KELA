@@ -33,7 +33,7 @@
                 </a>
                 <nav class="hidden md:flex gap-6 text-sm text-gray-500 font-medium">
                     <a href="/" class="hover:text-black">Beranda</a>
-                    <a href="#" class="hover:text-black">Kegiatan</a>
+                    <a href="{{ route('kegiatan.index') }}" class="hover:text-black">Kegiatan</a>
                     <a href="#" class="hover:text-black">Tentang</a>
                 </nav>
                 <div class="flex items-center gap-4 text-sm font-medium">
