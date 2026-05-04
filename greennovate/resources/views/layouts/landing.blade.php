@@ -140,8 +140,9 @@
                        class="{{ request()->is('/') ? 'text-[#0D8B41] font-semibold' : 'text-gray-500 hover:text-[#0D8B41]' }} transition-colors">
                         Beranda
                     </a>
-                    <a href="#" id="nav-kegiatan"
-                       class="text-gray-500 hover:text-[#0D8B41] transition-colors">
+        
+                    <a href="{{ route('kegiatan.index') }}" id="nav-kegiatan"
+                        class="text-gray-500 hover:text-[#0D8B41] transition-colors">
                         Kegiatan
                     </a>
                     <a href="#" id="nav-tentang"

@@ -36,6 +36,7 @@ class UpdateProfileRequest extends FormRequest
                 'max:20',
                 Rule::unique('users', 'phone')->ignore($this->user()->id),
             ],
+            'city' => ['nullable', 'string', 'max:100'],
         ];
     }
 
@@ -51,6 +52,7 @@ class UpdateProfileRequest extends FormRequest
             'email.unique'   => __('This email is already used by another account.'),
             'phone.max'      => __('Phone number must not exceed 20 characters.'),
             'phone.unique'   => __('This phone number is already used by another account.'),
+            'city.max'       => __('City must not exceed 100 characters.'),
         ];
     }
 }

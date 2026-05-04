@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Route;
 // ─── Public ───────────────────────────────────────────────────────────────────
 Route::get('/', [LandingController::class, 'index'])->name('home');
 
+// ─── Kegiatan public (bisa diakses tanpa login) ───────────────────────────────
+Route::get('/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
+Route::get('/kegiatan/{slug}', [KegiatanController::class, 'show'])->name('kegiatan.show');
+
 // ─── Guest routes (Hanya untuk yang belum login) ──────────────────────────────
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'showForm'])->name('register');
@@ -32,9 +36,7 @@ Route::middleware(['auth', 'check.active'])->group(function () {
     // Dispatcher: Mengarahkan user ke dashboard sesuai role masing-masing
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // ── Kegiatan (user) ───────────────────────────────────────────────────────
-    Route::get('/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
-    Route::get('/kegiatan/{slug}', [KegiatanController::class, 'show'])->name('kegiatan.show');
+    // ── Kegiatan - hanya form daftar yang butuh login ─────────────────────────
     Route::get('/kegiatan/{slug}/daftar', [KegiatanController::class, 'showDaftarForm'])->name('kegiatan.daftar.form');
     Route::post('/kegiatan/{slug}/daftar', [KegiatanController::class, 'daftar'])->name('kegiatan.daftar');
 
@@ -43,6 +45,7 @@ Route::middleware(['auth', 'check.active'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::patch('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // ── Admin routes ──────────────────────────────────────────────────────────
     Route::middleware('is.admin')
@@ -50,11 +53,7 @@ Route::middleware(['auth', 'check.active'])->group(function () {
         ->name('admin.')
         ->group(function () {
             Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-
-            // Manajemen Kegiatan Reboisasi
             Route::resource('kegiatan', AdminKegiatanController::class);
-
-            // Manajemen Lokasi Lahan
             Route::resource('lokasi', LokasiLahanController::class);
         });
 

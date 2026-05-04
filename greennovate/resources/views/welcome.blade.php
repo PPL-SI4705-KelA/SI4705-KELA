@@ -31,7 +31,7 @@
 
                 {{-- CTA --}}
                 <div class="flex flex-wrap gap-3">
-                    <a href="#stats" id="hero-kegiatan-btn"
+                    <a href="{{ route('kegiatan.index') }}" id="hero-kegiatan-btn"
                        class="inline-flex items-center gap-2 bg-[#0D8B41] hover:bg-[#085c2b] text-white font-semibold px-6 py-3 rounded-lg transition-all hover:shadow-lg text-sm">
                         Lihat Kegiatan
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

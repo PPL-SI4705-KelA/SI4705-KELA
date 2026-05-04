@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class Kegiatan extends Model
@@ -40,6 +41,25 @@ class Kegiatan extends Model
         'quota'                 => 'integer',
         'registered_count'      => 'integer',
     ];
+
+    // ── Boot: Auto-generate slug saat kegiatan dibuat ────────────────────────
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function ($kegiatan) {
+            if (empty($kegiatan->slug)) {
+                $kegiatan->slug = Str::slug($kegiatan->nama) . '-' . time();
+            }
+        });
+
+        static::updating(function ($kegiatan) {
+            if (empty($kegiatan->slug)) {
+                $kegiatan->slug = Str::slug($kegiatan->nama) . '-' . $kegiatan->id;
+            }
+        });
+    }
 
     // ── Relasi ──────────────────────────────────────────────────────────────
 

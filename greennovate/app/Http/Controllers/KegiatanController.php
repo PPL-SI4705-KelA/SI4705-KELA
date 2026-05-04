@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kegiatan;
+use App\Models\LokasiLahan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,11 +12,27 @@ class KegiatanController extends Controller
     /**
      * Tampilkan daftar kegiatan yang tersedia.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $kegiatan = Kegiatan::orderBy('tanggal', 'asc')->get();
+        $lokasiList = LokasiLahan::orderBy('nama')->get();
 
-        return view('kegiatan.index', compact('kegiatan'));
+        $query = Kegiatan::query();
+
+        if ($request->filled('lokasi')) {
+            $query->where('lokasi_lahan_id', $request->lokasi);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('bulan')) {
+            $query->whereMonth('tanggal', $request->bulan);
+        }
+
+        $kegiatan = $query->orderBy('tanggal', 'asc')->paginate(9)->withQueryString();
+
+        return view('kegiatan.index', compact('kegiatan', 'lokasiList'));
     }
 
     /**
@@ -73,14 +90,14 @@ class KegiatanController extends Controller
 
         $request->validate([
             'nama_lengkap' => 'required|string|max:255',
-            'no_hp'        => 'required|string|max:20',
-            'alamat'       => 'required|string|max:500',
-            'pernyataan'   => 'accepted',
+            'no_hp' => 'required|string|max:20',
+            'alamat' => 'required|string|max:500',
+            'pernyataan' => 'accepted',
         ], [
             'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
-            'no_hp.required'        => 'Nomor HP wajib diisi.',
-            'alamat.required'       => 'Alamat wajib diisi.',
-            'pernyataan.accepted'   => 'Anda harus menyetujui ketentuan yang berlaku.',
+            'no_hp.required' => 'Nomor HP wajib diisi.',
+            'alamat.required' => 'Alamat wajib diisi.',
+            'pernyataan.accepted' => 'Anda harus menyetujui ketentuan yang berlaku.',
         ]);
 
         $kegiatan->increment('registered_count');
