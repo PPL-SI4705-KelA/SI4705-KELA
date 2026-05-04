@@ -10,6 +10,7 @@ use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Petugas\PetugasDashboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RiwayatController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Public ───────────────────────────────────────────────────────────────────
@@ -46,6 +47,13 @@ Route::middleware(['auth', 'check.active'])->group(function () {
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::patch('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // ── Riwayat Partisipasi ───────────────────────────────────────────────
+    Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
+    Route::get('/riwayat/{type}/{id}', [RiwayatController::class, 'detail'])->name('riwayat.detail')
+        ->where('type', 'donasi|pembelian|kegiatan');
+    Route::get('/riwayat/{type}/{id}/download-dokumentasi', [RiwayatController::class, 'downloadDokumentasi'])->name('riwayat.download')
+        ->where('type', 'donasi|pembelian|kegiatan');
 
     // ── Admin routes ──────────────────────────────────────────────────────────
     Route::middleware('is.admin')

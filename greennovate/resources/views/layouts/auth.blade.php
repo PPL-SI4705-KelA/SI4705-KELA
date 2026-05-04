@@ -75,6 +75,10 @@
                                 class="block px-4 py-2 text-sm hover:bg-gray-100">
                                 {{ __('Profile') }}
                             </a>
+                            <a href="{{ route('riwayat.index') }}"
+                                class="block px-4 py-2 text-sm hover:bg-gray-100">
+                                {{ __('Riwayat Partisipasi') }}
+                            </a>
 
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
