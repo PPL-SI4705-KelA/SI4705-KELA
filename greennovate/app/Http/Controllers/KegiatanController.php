@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kegiatan;
+use App\Models\PendaftaranKegiatan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -83,10 +84,20 @@ class KegiatanController extends Controller
             'pernyataan.accepted'   => 'Anda harus menyetujui ketentuan yang berlaku.',
         ]);
 
+        // Simpan data pendaftaran ke tabel riwayat
+        PendaftaranKegiatan::create([
+            'user_id'      => Auth::id(),
+            'kegiatan_id'  => $kegiatan->id,
+            'nama_lengkap' => $request->nama_lengkap,
+            'no_hp'        => $request->no_hp,
+            'alamat'       => $request->alamat,
+            'status'       => 'Menunggu', // Default status
+        ]);
+
         $kegiatan->increment('registered_count');
 
         return redirect()
             ->route('kegiatan.show', $slug)
-            ->with('success', 'Pendaftaran berhasil! Anda telah terdaftar untuk kegiatan "' . $kegiatan->nama . '".');
+            ->with('success', 'Pendaftaran berhasil! Anda telah terdaftar untuk kegiatan "' . $kegiatan->nama . '". Silakan cek menu Riwayat Partisipasi untuk melihat status pendaftaran Anda.');
     }
 }
