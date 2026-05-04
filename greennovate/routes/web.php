@@ -10,7 +10,6 @@ use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Petugas\PetugasDashboardController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\RiwayatController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Public ───────────────────────────────────────────────────────────────────
@@ -48,6 +47,7 @@ Route::middleware(['auth', 'check.active'])->group(function () {
     Route::patch('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+<<<<<<< HEAD
     // ── Riwayat Partisipasi ───────────────────────────────────────────────────
     Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
     Route::get('/riwayat/{type}/{id}', [RiwayatController::class, 'detail'])
@@ -57,6 +57,8 @@ Route::middleware(['auth', 'check.active'])->group(function () {
         ->name('riwayat.download')
         ->where('type', 'donasi|pembelian|kegiatan');
 
+=======
+>>>>>>> parent of 5b93d16 (Merge yuka_branch (Participation History) into main)
     // ── Admin routes ──────────────────────────────────────────────────────────
     Route::middleware('is.admin')
         ->prefix('admin')

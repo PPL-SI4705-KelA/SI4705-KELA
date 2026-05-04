@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kegiatan;
+<<<<<<< HEAD
 use App\Models\LokasiLahan;
 use App\Models\PendaftaranKegiatan;
+=======
+>>>>>>> parent of 5b93d16 (Merge yuka_branch (Participation History) into main)
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -120,6 +123,7 @@ class KegiatanController extends Controller
             'pernyataan.accepted'   => 'Anda harus menyetujui ketentuan yang berlaku.',
         ]);
 
+<<<<<<< HEAD
         // Simpan data pendaftaran ke tabel riwayat (dari HEAD)
         PendaftaranKegiatan::create([
             'user_id'      => Auth::id(),
@@ -131,6 +135,8 @@ class KegiatanController extends Controller
         ]);
 
         // Update counter kuota (dari Alvin_Branch)
+=======
+>>>>>>> parent of 5b93d16 (Merge yuka_branch (Participation History) into main)
         $kegiatan->increment('registered_count');
 
         // Invalidate cache detail kegiatan ini
@@ -138,6 +144,6 @@ class KegiatanController extends Controller
 
         return redirect()
             ->route('kegiatan.show', $slug)
-            ->with('success', 'Pendaftaran berhasil! Anda telah terdaftar untuk kegiatan "' . $kegiatan->nama . '". Silakan cek menu Riwayat Partisipasi untuk melihat status pendaftaran Anda.');
+            ->with('success', 'Pendaftaran berhasil! Anda telah terdaftar untuk kegiatan "' . $kegiatan->nama . '".');
     }
 }

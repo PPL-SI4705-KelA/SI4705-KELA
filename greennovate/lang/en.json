@@ -91,6 +91,7 @@
     "Account deleted successfully.": "Account deleted successfully.",
     "The password is incorrect.": "The password is incorrect.",
     "Show Password": "Show Password",
+<<<<<<< HEAD
     "Hide Password": "Hide Password",
 
     "Riwayat Partisipasi": "Participation History",
@@ -133,3 +134,7 @@
     "File dokumentasi tidak ditemukan. Silakan hubungi admin.": "Documentation file not found. Please contact admin.",
     "Kembali ke Riwayat": "Back to History"
 }
+=======
+    "Hide Password": "Hide Password"
+}
+>>>>>>> parent of 5b93d16 (Merge yuka_branch (Participation History) into main)

@@ -16,10 +16,29 @@ class User extends Authenticatable
     /**
      * Konstanta role yang tersedia di sistem Greennovate.
      */
+<<<<<<< HEAD
     const ROLE_USER    = 'user';
     const ROLE_ADMIN   = 'admin';
     const ROLE_PETUGAS = 'petugas';
  
+=======
+    public function up(): void
+    {
+        Schema::create('kegiatan', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama');
+            $table->foreignId('lokasi_lahan_id')->constrained('lokasi_lahans')->onDelete('cascade');
+            $table->foreignId('petugas_id')->constrained('users')->onDelete('cascade'); // The officer assigned
+            $table->date('tanggal');
+            $table->integer('target_pohon');
+            $table->integer('realisasi_pohon')->default(0);
+            $table->enum('status', ['Persiapan', 'Berlangsung', 'Selesai', 'Dibatalkan'])->default('Persiapan');
+            $table->text('deskripsi')->nullable();
+            $table->timestamps();
+        });
+    }
+
+>>>>>>> parent of 5b93d16 (Merge yuka_branch (Participation History) into main)
     /**
      * Atribut yang dapat diisi melalui mass assignment.
      *

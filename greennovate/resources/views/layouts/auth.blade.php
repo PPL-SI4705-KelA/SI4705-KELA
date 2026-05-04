@@ -61,9 +61,17 @@
                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                     </button>
 
+<<<<<<< HEAD
                     <div x-show="open" @click.outside="open = false"
                          class="absolute right-0 mt-2 w-44 bg-white border rounded-lg shadow-lg z-50"
                          style="display: none;">
+=======
+                            <!-- Menu Links -->
+                            <a href="{{ route('profile.edit') }}"
+                                class="block px-4 py-2 text-sm hover:bg-gray-100">
+                                {{ __('Profile') }}
+                            </a>
+>>>>>>> parent of 5b93d16 (Merge yuka_branch (Participation History) into main)
 
                         <div class="px-4 py-2 border-b">
                             <p class="text-sm font-semibold">{{ Auth::user()->name }}</p>
