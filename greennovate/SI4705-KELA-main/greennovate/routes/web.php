@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\JenisPohonController;
 use App\Http\Controllers\Admin\KegiatanController as AdminKegiatanController;
 use App\Http\Controllers\Admin\LokasiLahanController;
 use App\Http\Controllers\Auth\LoginController;
@@ -65,6 +66,7 @@ Route::middleware(['auth', 'check.active'])->group(function () {
             Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
             Route::resource('kegiatan', AdminKegiatanController::class);
             Route::resource('lokasi', LokasiLahanController::class);
+            Route::resource('jenis-pohon', JenisPohonController::class)->except(['show']);
         });
 
     // ── Petugas routes ────────────────────────────────────────────────────────
