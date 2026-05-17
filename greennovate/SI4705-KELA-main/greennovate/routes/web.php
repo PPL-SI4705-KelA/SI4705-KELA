@@ -69,11 +69,17 @@ Route::middleware(['auth', 'check.active'])->group(function () {
             Route::resource('jenis-pohon', JenisPohonController::class)->except(['show']);
         });
 
-    // ── Petugas routes ────────────────────────────────────────────────────────
+    // ── Petugas routes (PB-21) ────────────────────────────────────────────────
     Route::middleware('is.petugas')
         ->prefix('petugas')
         ->name('petugas.')
         ->group(function () {
             Route::get('/dashboard', [PetugasDashboardController::class, 'index'])->name('dashboard');
+            Route::get('/semua-kegiatan', [PetugasDashboardController::class, 'semuaKegiatan'])->name('semua-kegiatan');
+
+            // API endpoints
+            Route::get('/api/jenis-pohon', [PetugasDashboardController::class, 'getJenisPohon'])->name('api.jenis-pohon');
+            Route::post('/api/kegiatan/{kegiatan}/realisasi', [PetugasDashboardController::class, 'storeRealisasi'])->name('api.store-realisasi');
+            Route::get('/api/dashboard', [PetugasDashboardController::class, 'apiDashboard'])->name('api.dashboard');
         });
 });

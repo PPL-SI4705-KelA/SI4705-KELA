@@ -12,7 +12,7 @@ class KegiatanSeeder extends Seeder
 {
     public function run(): void
     {
-        // ── 1. Seed data kegiatan awal ─────────────────────────────────────────
+        // ── 1. Pastikan lokasi tersedia ─────────────────────────────────────────
         $petugas = User::where('role', 'petugas')->first();
 
         $lokasi1 = LokasiLahan::firstOrCreate(
@@ -25,7 +25,18 @@ class KegiatanSeeder extends Seeder
             ['alamat' => 'Morowali, Sulawesi Tengah', 'deskripsi' => 'Area tanam kembali pinggir pantai']
         );
 
+        $lokasi3 = LokasiLahan::firstOrCreate(
+            ['nama' => 'Taman Nasional Morawa'],
+            ['alamat' => 'Morawa, Sumatera Utara', 'deskripsi' => 'Kawasan konservasi hutan tropis']
+        );
+
+        $lokasi4 = LokasiLahan::firstOrCreate(
+            ['nama' => 'DAS Citarum Hulu'],
+            ['alamat' => 'Bandung, Jawa Barat', 'deskripsi' => 'Program penghijauan DAS Citarum']
+        );
+
         if ($petugas) {
+            // ── 2. Seed kegiatan dengan berbagai status ────────────────────────────
             Kegiatan::firstOrCreate(
                 ['nama' => 'Aksi Tanam Pohon Berau'],
                 [
@@ -49,9 +60,45 @@ class KegiatanSeeder extends Seeder
                     'status'          => 'Berlangsung',
                 ]
             );
+
+            Kegiatan::firstOrCreate(
+                ['nama' => 'Penghijauan Morawa Fase 2'],
+                [
+                    'lokasi_lahan_id' => $lokasi3->id,
+                    'petugas_id'      => $petugas->id,
+                    'tanggal'         => '2026-06-01',
+                    'target_pohon'    => 2000,
+                    'realisasi_pohon' => 0,
+                    'status'          => 'Persiapan',
+                ]
+            );
+
+            Kegiatan::firstOrCreate(
+                ['nama' => 'Restorasi DAS Citarum'],
+                [
+                    'lokasi_lahan_id' => $lokasi4->id,
+                    'petugas_id'      => $petugas->id,
+                    'tanggal'         => '2026-01-15',
+                    'target_pohon'    => 500,
+                    'realisasi_pohon' => 500,
+                    'status'          => 'Selesai',
+                ]
+            );
+
+            Kegiatan::firstOrCreate(
+                ['nama' => 'Program Mangrove Pantai Timur'],
+                [
+                    'lokasi_lahan_id' => $lokasi2->id,
+                    'petugas_id'      => $petugas->id,
+                    'tanggal'         => '2026-04-20',
+                    'target_pohon'    => 800,
+                    'realisasi_pohon' => 240,
+                    'status'          => 'Berlangsung',
+                ]
+            );
         }
 
-        // ── 2. Isi slug untuk semua kegiatan yang belum punya slug ─────────────
+        // ── 3. Isi slug untuk semua kegiatan yang belum punya slug ─────────────
         $kegiatanTanpaSlug = Kegiatan::withTrashed()
             ->where(function ($query) {
                 $query->whereNull('slug')->orWhere('slug', '');
