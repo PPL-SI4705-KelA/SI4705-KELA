@@ -73,6 +73,11 @@ class Kegiatan extends Model
         return $this->belongsTo(User::class, 'petugas_id');
     }
 
+    public function realisasis()
+    {
+        return $this->hasMany(Realisasi::class, 'kegiatan_id');
+    }
+
     // ── Helper ──────────────────────────────────────────────────────────────
 
     public function hasPendaftar(): bool
