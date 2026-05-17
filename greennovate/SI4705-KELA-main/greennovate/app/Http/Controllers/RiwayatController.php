@@ -45,7 +45,7 @@ class RiwayatController extends Controller
                     'status_label' => RiwayatMapper::statusMapper($d->status, 'donasi'),
                     'status_color' => RiwayatMapper::statusColor(RiwayatMapper::statusMapper($d->status, 'donasi')),
                     'kode' => $d->kode_transaksi,
-                    'detail' => 'Rp ' . number_format($d->jumlah, 0, ',', '.'),
+                    'detail' => 'Rp ' . number_format((float)($d->jumlah ?? 0), 0, ',', '.'),
                 ]);
             }
         }
@@ -65,7 +65,7 @@ class RiwayatController extends Controller
                     'status_label' => RiwayatMapper::statusMapper($p->status, 'pembelian'),
                     'status_color' => RiwayatMapper::statusColor(RiwayatMapper::statusMapper($p->status, 'pembelian')),
                     'kode' => $p->kode_transaksi,
-                    'detail' => 'Rp ' . number_format($p->total_harga, 0, ',', '.'),
+                    'detail' => 'Rp ' . number_format((float)($p->total_harga ?? 0), 0, ',', '.'),
                 ]);
             }
         }
@@ -147,7 +147,7 @@ class RiwayatController extends Controller
                     'status_label' => RiwayatMapper::statusMapper($record->status, 'donasi'),
                     'status_color' => RiwayatMapper::statusColor(RiwayatMapper::statusMapper($record->status, 'donasi')),
                     'kode' => $record->kode_transaksi,
-                    'jumlah' => 'Rp ' . number_format($record->jumlah, 0, ',', '.'),
+                    'jumlah' => 'Rp ' . number_format((float)($record->jumlah ?? 0), 0, ',', '.'),
                     'metode' => $record->metode_pembayaran ?? '-',
                     'catatan' => $record->catatan,
                     'has_qr' => false,
@@ -174,7 +174,7 @@ class RiwayatController extends Controller
                     'status_label' => RiwayatMapper::statusMapper($record->status, 'pembelian'),
                     'status_color' => RiwayatMapper::statusColor(RiwayatMapper::statusMapper($record->status, 'pembelian')),
                     'kode' => $record->kode_transaksi,
-                    'jumlah' => 'Rp ' . number_format($record->total_harga, 0, ',', '.'),
+                    'jumlah' => 'Rp ' . number_format((float)($record->total_harga ?? 0), 0, ',', '.'),
                     'jumlah_item' => $record->jumlah_item,
                     'catatan' => $record->catatan,
                     'has_qr' => $record->hasQrCode(),
@@ -291,7 +291,7 @@ class RiwayatController extends Controller
         $extension = pathinfo($filePath, PATHINFO_EXTENSION);
         $downloadName = $fileName . '.' . $extension;
 
-        return Storage::disk('public')->download($filePath, $downloadName);
+        return response()->download(Storage::disk('public')->path($filePath), $downloadName);
     }
 
     // ─── API Endpoints ──────────────────────────────────────────────────────

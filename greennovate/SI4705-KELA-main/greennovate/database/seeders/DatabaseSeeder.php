@@ -57,6 +57,7 @@ class DatabaseSeeder extends Seeder
         // ── Seeder tambahan ────────────────────────────────────────────────────
         $this->call([
             KegiatanSeeder::class,
+            JenisPohonSeeder::class,
         ]);
     }
 }
