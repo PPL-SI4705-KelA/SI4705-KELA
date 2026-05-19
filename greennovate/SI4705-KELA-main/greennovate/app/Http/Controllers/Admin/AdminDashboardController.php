@@ -19,8 +19,8 @@ class AdminDashboardController extends Controller
             'total_users'      => User::where('role', 'user')->count(),
             'total_petugas'    => User::where('role', 'petugas')->count(),
             'total_admin'      => User::where('role', 'admin')->count(),
-            'total_aktif'      => User::where('is_active', true)->count(),
-            'total_nonaktif'   => User::where('is_active', false)->count(),
+            'total_aktif'      => User::where('is_active', 'true')->count(),
+            'total_nonaktif'   => User::where('is_active', 'false')->count(),
             'total_lokasi'     => LokasiLahan::count(),
             'pengguna_terbaru' => User::where('role', '!=', 'admin')
                                       ->latest()
