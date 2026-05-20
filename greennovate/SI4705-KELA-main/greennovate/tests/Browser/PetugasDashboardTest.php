@@ -10,7 +10,7 @@ class PetugasDashboardTest extends DuskTestCase
     /**
      * Note: User sudah ada di database dengan password:
      * - petugas@greennovate.test : petugas123
-     * - user@greennovate.test : user12345
+     * - user@greennovate.test : user12345 aaa
      */
 
     /**
