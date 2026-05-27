@@ -79,6 +79,10 @@
                                 class="block px-4 py-2 text-sm hover:bg-gray-100">
                                 {{ __('Profile') }}
                             </a>
+                            <a href="{{ route('chat.index') }}"
+                                class="block px-4 py-2 text-sm hover:bg-gray-100 text-green-700">
+                                {{ __('Hubungi Admin') }}
+                            </a>
 
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf

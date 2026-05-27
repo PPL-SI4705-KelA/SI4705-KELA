@@ -12,6 +12,8 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Petugas\PetugasDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\Admin\AdminChatController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Public ───────────────────────────────────────────────────────────────────
@@ -58,6 +60,11 @@ Route::middleware(['auth', 'check.active'])->group(function () {
     Route::get('/api/riwayat', [RiwayatController::class, 'apiIndex'])->name('api.riwayat.index');
     Route::get('/api/riwayat/{tipe}/{id}/detail', [RiwayatController::class, 'apiDetail'])->name('api.riwayat.detail');
 
+    // ── Chat (User) ──────────────────────────────────────────────────────────
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::post('/chat/send', [ChatController::class, 'send'])->name('chat.send');
+    Route::get('/chat/messages', [ChatController::class, 'getMessages'])->name('chat.messages');
+
     // ── Admin routes ──────────────────────────────────────────────────────────
     Route::middleware('is.admin')
         ->prefix('admin')
@@ -67,6 +74,12 @@ Route::middleware(['auth', 'check.active'])->group(function () {
             Route::resource('kegiatan', AdminKegiatanController::class);
             Route::resource('lokasi', LokasiLahanController::class);
             Route::resource('jenis-pohon', JenisPohonController::class)->except(['show']);
+
+            // ── Chat (Admin) ──────────────────────────────────────────────────
+            Route::get('/chat', [AdminChatController::class, 'index'])->name('chat.index');
+            Route::get('/chat/{conversation}', [AdminChatController::class, 'show'])->name('chat.show');
+            Route::post('/chat/{conversation}/reply', [AdminChatController::class, 'reply'])->name('chat.reply');
+            Route::get('/chat/{conversation}/messages', [AdminChatController::class, 'getMessages'])->name('chat.messages');
         });
 
     // ── Petugas routes (PB-21) ────────────────────────────────────────────────
