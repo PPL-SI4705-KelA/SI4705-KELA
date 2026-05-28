@@ -1,4 +1,4 @@
-@extends('layouts.auth')
+@extends('layouts.admin')
 
 @section('title', 'Tambah Kegiatan - Greennovate Admin')
 

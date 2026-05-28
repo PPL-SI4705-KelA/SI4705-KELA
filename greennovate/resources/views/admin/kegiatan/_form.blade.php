@@ -102,6 +102,21 @@
     </div>
 </div>
 
+{{-- Kuota Peserta --}}
+<div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">
+        Kuota Peserta <span class="text-red-500">*</span>
+    </label>
+    <input type="number" name="quota" min="1"
+           value="{{ old('quota', $kegiatan->quota ?? 1) }}"
+           placeholder="Contoh: 100"
+           class="w-full border @error('quota') border-red-400 @else border-gray-300 @enderror
+                  rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+    @error('quota')
+        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+    @enderror
+</div>
+
 {{-- Deskripsi --}}
 <div>
     <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>

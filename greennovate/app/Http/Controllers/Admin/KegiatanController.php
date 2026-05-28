@@ -51,6 +51,7 @@ class KegiatanController extends Controller
             'tanggal'         => ['required', 'date'],
             'target_pohon'    => ['required', 'integer', 'min:0'],
             'realisasi_pohon' => ['nullable', 'integer', 'min:0'],
+            'quota'           => ['required', 'integer', 'min:1'],
             'status'          => ['required', 'in:Persiapan,Berlangsung,Selesai,Dibatalkan'],
             'deskripsi'       => ['nullable', 'string'],
         ], [
@@ -62,6 +63,7 @@ class KegiatanController extends Controller
             'tanggal.required'         => 'Tanggal wajib diisi.',
             'target_pohon.min'         => 'Target pohon tidak boleh negatif.',
             'realisasi_pohon.min'      => 'Realisasi pohon tidak boleh negatif.',
+            'quota.required'           => 'Kuota wajib diisi.',
         ]);
 
         $validated['realisasi_pohon'] = $validated['realisasi_pohon'] ?? 0;
@@ -101,6 +103,7 @@ class KegiatanController extends Controller
             'tanggal'         => ['required', 'date'],
             'target_pohon'    => ['required', 'integer', 'min:0'],
             'realisasi_pohon' => ['nullable', 'integer', 'min:0'],
+            'quota'           => ['required', 'integer', 'min:1'],
             'status'          => ['required', 'in:Persiapan,Berlangsung,Selesai,Dibatalkan'],
             'deskripsi'       => ['nullable', 'string'],
         ], [

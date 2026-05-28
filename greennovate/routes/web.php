@@ -1,18 +1,25 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\JenisPohonController;
+use App\Http\Controllers\Admin\KegiatanController as AdminKegiatanController;
+use App\Http\Controllers\Admin\LokasiLahanController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\KegiatanController as AdminKegiatanController;
+use App\Http\Controllers\KegiatanController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Petugas\PetugasDashboardController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RiwayatController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Public ───────────────────────────────────────────────────────────────────
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [LandingController::class, 'index'])->name('home');
+
+// ─── Kegiatan public (bisa diakses tanpa login) ───────────────────────────────
+Route::get('/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
+Route::get('/kegiatan/{slug}', [KegiatanController::class, 'show'])->name('kegiatan.show');
 
 // ─── Guest routes (Hanya untuk yang belum login) ──────────────────────────────
 Route::middleware('guest')->group(function () {
@@ -31,25 +38,48 @@ Route::middleware(['auth', 'check.active'])->group(function () {
     // Dispatcher: Mengarahkan user ke dashboard sesuai role masing-masing
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // ── Profile (Bisa diakses Admin, Petugas, dan User) ──
-    Route::prefix('profile')->name('profile.')->group(function () {
-        Route::get('/',              [ProfileController::class, 'index'])->name('index');
-        Route::get('/edit',          [ProfileController::class, 'edit'])->name('edit');
-        Route::post('/update',       [ProfileController::class, 'update'])->name('update');
-        Route::get('/password',      [ProfileController::class, 'showChangePasswordForm'])->name('password.form');
-        Route::post('/password',     [ProfileController::class, 'updatePassword'])->name('password.update');
-    });
+    // ── Kegiatan - hanya form daftar yang butuh login ─────────────────────────
+    Route::get('/kegiatan/{slug}/daftar', [KegiatanController::class, 'showDaftarForm'])->name('kegiatan.daftar.form');
+    Route::post('/kegiatan/{slug}/daftar', [KegiatanController::class, 'daftar'])->name('kegiatan.daftar');
 
-    // ── Admin routes ───────────────────────────────────────────────────────────
-    Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    // ── Profile & Settings ────────────────────────────────────────────────────
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::patch('/profile/preferences', [ProfileController::class, 'updatePreferences'])->name('profile.preferences');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-        // GN-12: CRUD Kegiatan (Fitur Manajemen Reboisasi/Lingkungan)
-        Route::resource('kegiatan', AdminKegiatanController::class);
-    });
+    // ── Riwayat Partisipasi (PB-11) ───────────────────────────────────────
+    Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
+    Route::get('/riwayat/{tipe}/{id}/detail', [RiwayatController::class, 'detail'])->name('riwayat.detail');
+    Route::get('/riwayat/{tipe}/{id}/download', [RiwayatController::class, 'download'])->name('riwayat.download');
 
-    // ── Petugas routes ─────────────────────────────────────────────────────────
-    Route::prefix('petugas')->name('petugas.')->middleware('role:petugas')->group(function () {
-        Route::get('/dashboard', [PetugasDashboardController::class, 'index'])->name('dashboard');
-    });
+    // ── API Riwayat ───────────────────────────────────────────────────────
+    Route::get('/api/riwayat', [RiwayatController::class, 'apiIndex'])->name('api.riwayat.index');
+    Route::get('/api/riwayat/{tipe}/{id}/detail', [RiwayatController::class, 'apiDetail'])->name('api.riwayat.detail');
+
+    // ── Admin routes ──────────────────────────────────────────────────────────
+    Route::middleware('is.admin')
+        ->prefix('admin')
+        ->name('admin.')
+        ->group(function () {
+            Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+            Route::resource('kegiatan', AdminKegiatanController::class);
+            Route::resource('lokasi', LokasiLahanController::class);
+            Route::resource('jenis-pohon', JenisPohonController::class)->except(['show']);
+        });
+
+    // ── Petugas routes (PB-21) ────────────────────────────────────────────────
+    Route::middleware('is.petugas')
+        ->prefix('petugas')
+        ->name('petugas.')
+        ->group(function () {
+            Route::get('/dashboard', [PetugasDashboardController::class, 'index'])->name('dashboard');
+            Route::get('/semua-kegiatan', [PetugasDashboardController::class, 'semuaKegiatan'])->name('semua-kegiatan');
+
+            // API endpoints
+            Route::get('/api/jenis-pohon', [PetugasDashboardController::class, 'getJenisPohon'])->name('api.jenis-pohon');
+            Route::post('/api/kegiatan/{kegiatan}/realisasi', [PetugasDashboardController::class, 'storeRealisasi'])->name('api.store-realisasi');
+            Route::get('/api/dashboard', [PetugasDashboardController::class, 'apiDashboard'])->name('api.dashboard');
+        });
 });

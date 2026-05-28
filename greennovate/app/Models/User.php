@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -21,7 +22,6 @@ class User extends Authenticatable
 
     /**
      * Atribut yang dapat diisi melalui mass assignment.
-     * Sudah termasuk kolom 'city' yang sebelumnya konflik.
      *
      * @var list<string>
      */
@@ -33,6 +33,9 @@ class User extends Authenticatable
         'role',
         'is_active',
         'city',
+        'locale',
+        'notif_email',
+        'notif_push',
     ];
 
     /**
@@ -56,6 +59,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
             'is_active'         => 'boolean',
+            'notif_email'       => 'boolean',
+            'notif_push'        => 'boolean',
         ];
     }
 
@@ -88,5 +93,24 @@ class User extends Authenticatable
     public function hasRole(array|string $roles): bool
     {
         return in_array($this->role, (array) $roles);
+    }
+
+    // -------------------------------------------------------
+    // Relationships untuk Riwayat Partisipasi (PB-11)
+    // -------------------------------------------------------
+
+    public function donasis()
+    {
+        return $this->hasMany(Donasi::class);
+    }
+
+    public function pembelians()
+    {
+        return $this->hasMany(Pembelian::class);
+    }
+
+    public function pendaftaranKegiatans()
+    {
+        return $this->hasMany(PendaftaranKegiatan::class);
     }
 }
