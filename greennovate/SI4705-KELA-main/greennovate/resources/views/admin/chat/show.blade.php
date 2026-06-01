@@ -38,8 +38,14 @@
 
     <!-- Input Area -->
     <div class="p-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
-        <form id="chat-form" class="flex gap-2">
+        <form id="chat-form" class="flex gap-2 items-center" enctype="multipart/form-data">
             @csrf
+            <!-- File Input -->
+            <label for="chat-attachment" class="cursor-pointer text-gray-500 hover:text-green-600 transition p-2 bg-gray-200 rounded-full shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+            </label>
+            <input type="file" id="chat-attachment" name="attachment" class="hidden" accept=".jpg,.jpeg,.png,.pdf">
+
             <input type="text" id="chat-input" name="body" 
                 class="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 text-sm shadow-sm" 
                 placeholder="Tulis balasan..." maxlength="1000" autocomplete="off" required>
@@ -48,7 +54,9 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
             </button>
         </form>
-        <p id="chat-error" class="text-red-500 text-sm mt-2 hidden"></p>
+        <!-- Attachment Preview Name -->
+        <p id="attachment-name" class="text-xs text-green-600 font-medium mt-1 hidden"></p>
+        <p id="chat-error" class="text-red-500 text-sm mt-1 hidden"></p>
     </div>
 </div>
 @endsection
@@ -61,7 +69,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatInput = document.getElementById('chat-input');
     const chatSubmit = document.getElementById('chat-submit');
     const chatError = document.getElementById('chat-error');
+    const chatAttachment = document.getElementById('chat-attachment');
+    const attachmentName = document.getElementById('attachment-name');
     
+    chatAttachment.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            attachmentName.textContent = 'File: ' + this.files[0].name;
+            attachmentName.classList.remove('hidden');
+        } else {
+            attachmentName.classList.add('hidden');
+        }
+    });
+
     let lastMessageId = 0;
     let adminId = {{ Auth::id() }};
     const conversationId = {{ $conversation->id }};
@@ -91,12 +110,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const bubble = document.createElement('div');
         bubble.className = `rounded-2xl px-4 py-2 text-sm break-words shadow-sm ${isAdmin ? 'bg-green-600 text-white rounded-tr-none' : 'bg-gray-100 text-gray-800 rounded-tl-none border border-gray-200'}`;
-        bubble.textContent = msg.body;
+        
+        if (msg.attachment_path) {
+            const attachmentUrl = `/storage/${msg.attachment_path}`;
+            if (msg.attachment_type === 'image') {
+                const img = document.createElement('img');
+                img.src = attachmentUrl;
+                img.className = 'max-w-full h-auto rounded-lg mb-2 cursor-pointer bg-white';
+                img.style.maxHeight = '200px';
+                img.onclick = () => window.open(attachmentUrl, '_blank');
+                bubble.appendChild(img);
+            } else {
+                const link = document.createElement('a');
+                link.href = attachmentUrl;
+                link.target = '_blank';
+                link.className = `flex items-center gap-2 px-3 py-2 rounded-lg mb-2 text-sm font-medium ${isAdmin ? 'bg-green-700 text-white hover:bg-green-800' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`;
+                link.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> Buka Dokumen`;
+                bubble.appendChild(link);
+            }
+        }
+
+        if (msg.body) {
+            const body = document.createElement('p');
+            body.className = 'text-sm break-words';
+            body.textContent = msg.body;
+            bubble.appendChild(body);
+        }
         
         const meta = document.createElement('div');
         meta.className = 'flex items-center gap-1 text-[10px] text-gray-400 mt-0.5 px-1';
-        meta.textContent = time;
-
+        meta.innerHTML = `<span>${time}</span>`;
+        
         bubbleContainer.appendChild(bubble);
         bubbleContainer.appendChild(meta);
         wrapper.appendChild(bubbleContainer);
@@ -124,9 +168,10 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         const body = chatInput.value.trim();
+        const hasFile = chatAttachment.files.length > 0;
         
-        if (!body) {
-            chatError.textContent = 'Pesan tidak boleh kosong';
+        if (!body && !hasFile) {
+            chatError.textContent = 'Pesan atau lampiran tidak boleh kosong';
             chatError.classList.remove('hidden');
             return;
         }
@@ -141,6 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const formData = new FormData();
         formData.append('body', body);
+        if (hasFile) formData.append('attachment', chatAttachment.files[0]);
         formData.append('_token', document.querySelector('input[name="_token"]').value);
 
         fetch(`{{ route('admin.chat.reply', $conversation->id) }}`, {
@@ -154,6 +200,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 chatInput.value = '';
+                chatAttachment.value = '';
+                attachmentName.classList.add('hidden');
                 fetchMessages();
             } else if (data.errors) {
                 chatError.textContent = data.errors.body[0] || 'Gagal mengirim pesan.';

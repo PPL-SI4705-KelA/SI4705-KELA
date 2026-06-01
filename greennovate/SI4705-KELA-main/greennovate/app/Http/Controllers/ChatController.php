@@ -24,20 +24,37 @@ class ChatController extends Controller
     public function send(Request $request)
     {
         $request->validate([
-            'body' => 'required|string|max:1000',
+            'body' => 'nullable|string|max:1000',
+            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ], [
-            'body.required' => 'Pesan tidak boleh kosong',
             'body.max' => 'Pesan maksimal 1000 karakter',
+            'attachment.mimes' => 'Format file yang diizinkan hanya JPG, PNG, atau PDF',
+            'attachment.max' => 'Ukuran file maksimal 2MB',
         ]);
+
+        if (!$request->body && !$request->hasFile('attachment')) {
+            return response()->json(['errors' => ['body' => ['Pesan atau lampiran tidak boleh kosong']]], 422);
+        }
 
         $conversation = Conversation::firstOrCreate(
             ['user_id' => Auth::id()],
             ['status' => 'open']
         );
 
+        $attachmentPath = null;
+        $attachmentType = null;
+
+        if ($request->hasFile('attachment')) {
+            $file = $request->file('attachment');
+            $attachmentPath = $file->store('chat_attachments', 'public');
+            $attachmentType = $file->getClientOriginalExtension() === 'pdf' ? 'document' : 'image';
+        }
+
         $message = $conversation->messages()->create([
             'sender_id' => Auth::id(),
             'body' => $request->body,
+            'attachment_path' => $attachmentPath,
+            'attachment_type' => $attachmentType,
         ]);
 
         $conversation->update(['last_message_at' => now()]);
@@ -63,6 +80,12 @@ class ChatController extends Controller
         if (!$conversation) {
             return response()->json([]);
         }
+
+        // Mark messages from admin as read
+        $conversation->messages()
+            ->where('sender_id', '!=', Auth::id())
+            ->whereRaw('is_read = false')
+            ->update(['is_read' => \Illuminate\Support\Facades\DB::raw('true'), 'read_at' => now()]);
 
         $query = $conversation->messages()->with('sender')->orderBy('created_at', 'asc');
 

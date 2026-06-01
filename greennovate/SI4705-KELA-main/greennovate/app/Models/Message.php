@@ -16,6 +16,8 @@ class Message extends Model
         'body',
         'is_read',
         'read_at',
+        'attachment_path',
+        'attachment_type',
     ];
 
     protected $casts = [
@@ -31,5 +33,13 @@ class Message extends Model
     public function sender(): BelongsTo
     {
         return $this->belongsTo(User::class, 'sender_id');
+    }
+
+    public function getAttachmentUrlAttribute()
+    {
+        if ($this->attachment_path) {
+            return asset('storage/' . $this->attachment_path);
+        }
+        return null;
     }
 }

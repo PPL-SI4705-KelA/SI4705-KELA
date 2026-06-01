@@ -193,8 +193,14 @@
                         {{-- User avatar + name --}}
                         <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : (auth()->user()->role === 'petugas' ? route('petugas.dashboard') : route('dashboard')) }}" id="nav-user-pill"
                            class="flex items-center gap-2 rounded-full px-2 py-1 hover:bg-gray-100 transition-colors ml-1">
-                            <div class="w-7 h-7 rounded-full bg-[#0D8B41] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                            <div class="relative w-7 h-7 rounded-full bg-[#0D8B41] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                @if(isset($unreadChatCount) && $unreadChatCount > 0)
+                                    <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-white"></span>
+                                    </span>
+                                @endif
                             </div>
                             <span class="text-sm font-semibold text-gray-700">{{ auth()->user()->name }}</span>
                         </a>
