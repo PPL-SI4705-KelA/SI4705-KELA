@@ -14,7 +14,14 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * Konstanta role yang tersedia di sistem Greennovate.
+     */
+    const ROLE_USER    = 'user';
+    const ROLE_ADMIN   = 'admin';
+    const ROLE_PETUGAS = 'petugas';
+
+    /**
+     * Atribut yang dapat diisi melalui mass assignment.
      *
      * @var list<string>
      */
@@ -25,11 +32,14 @@ class User extends Authenticatable
         'password',
         'role',
         'is_active',
-        'city'
+        'city',
+        'locale',
+        'notif_email',
+        'notif_push',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Atribut yang disembunyikan saat serialisasi (misal: API response).
      *
      * @var list<string>
      */
@@ -39,7 +49,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * Casting atribut ke tipe data yang sesuai.
      *
      * @return array<string, string>
      */
@@ -47,8 +57,60 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'is_active' => 'boolean',
+            'password'          => 'hashed',
+            'is_active'         => 'boolean',
+            'notif_email'       => 'boolean',
+            'notif_push'        => 'boolean',
         ];
+    }
+
+    // -------------------------------------------------------
+    // Helper Methods untuk Role (Penting untuk Middleware)
+    // -------------------------------------------------------
+
+    /** Cek apakah user adalah Admin. */
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    /** Cek apakah user adalah Petugas. */
+    public function isPetugas(): bool
+    {
+        return $this->role === self::ROLE_PETUGAS;
+    }
+
+    /** Cek apakah user adalah User biasa. */
+    public function isUser(): bool
+    {
+        return $this->role === self::ROLE_USER;
+    }
+
+    /**
+     * Cek apakah user memiliki salah satu dari role yang diberikan.
+     * Berguna jika satu fitur bisa diakses beberapa role.
+     */
+    public function hasRole(array|string $roles): bool
+    {
+        return in_array($this->role, (array) $roles);
+    }
+
+    // -------------------------------------------------------
+    // Relationships untuk Riwayat Partisipasi (PB-11)
+    // -------------------------------------------------------
+
+    public function donasis()
+    {
+        return $this->hasMany(Donasi::class);
+    }
+
+    public function pembelians()
+    {
+        return $this->hasMany(Pembelian::class);
+    }
+
+    public function pendaftaranKegiatans()
+    {
+        return $this->hasMany(PendaftaranKegiatan::class);
     }
 }

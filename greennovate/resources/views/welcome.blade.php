@@ -31,7 +31,7 @@
 
                 {{-- CTA --}}
                 <div class="flex flex-wrap gap-3">
-                    <a href="#stats" id="hero-kegiatan-btn"
+                    <a href="{{ route('kegiatan.index') }}" id="hero-kegiatan-btn"
                        class="inline-flex items-center gap-2 bg-[#0D8B41] hover:bg-[#085c2b] text-white font-semibold px-6 py-3 rounded-lg transition-all hover:shadow-lg text-sm">
                         Lihat Kegiatan
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -226,9 +226,9 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             @foreach([
-                ['icon'=>'🌍','title'=>'Dampak Nyata',       'desc'=>'Setiap aksi di Greennovate terukur dan terdokumentasi sehingga kamu tahu persis dampak yang kamu ciptakan.'],
-                ['icon'=>'🤝','title'=>'Komunitas Peduli',   'desc'=>'Bergabung dengan ribuan relawan dan donatur yang sama-sama bersemangat menjaga kelestarian alam.'],
-                ['icon'=>'📊','title'=>'Transparansi Penuh', 'desc'=>'Semua program, donasi, dan hasilnya tersaji secara terbuka. Tidak ada yang disembunyikan.'],
+                ['icon' => '🌍', 'title' => 'Dampak Nyata',       'desc' => 'Setiap aksi di Greennovate terukur dan terdokumentasi sehingga kamu tahu persis dampak yang kamu ciptakan.'],
+                ['icon' => '🤝', 'title' => 'Komunitas Peduli',   'desc' => 'Bergabung dengan ribuan relawan dan donatur yang sama-sama bersemangat menjaga kelestarian alam.'],
+                ['icon' => '📊', 'title' => 'Transparansi Penuh', 'desc' => 'Semua program, donasi, dan hasilnya tersaji secara terbuka. Tidak ada yang disembunyikan.'],
             ] as $i => $item)
             <div class="feature-card bg-white rounded-2xl p-6 border border-gray-100 shadow-sm reveal" style="transition-delay:{{ $i * 80 }}ms">
                 <div class="text-3xl mb-4">{{ $item['icon'] }}</div>
@@ -249,9 +249,9 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
             @foreach([
-                ['num'=>'01','title'=>'Daftar Akun',  'desc'=>'Buat akunmu gratis dalam hitungan detik. Tidak perlu kartu kredit.'],
-                ['num'=>'02','title'=>'Pilih Kegiatan','desc'=>'Jelajahi berbagai kegiatan penghijauan dan pilih yang sesuai minatmu.'],
-                ['num'=>'03','title'=>'Beri Dampak',   'desc'=>'Ikuti kegiatan dan pantau dampak nyata yang kamu ciptakan untuk bumi.'],
+                ['num' => '01', 'title' => 'Daftar Akun',   'desc' => 'Buat akunmu gratis dalam hitungan detik. Tidak perlu kartu kredit.'],
+                ['num' => '02', 'title' => 'Pilih Kegiatan', 'desc' => 'Jelajahi berbagai kegiatan penghijauan dan pilih yang sesuai minatmu.'],
+                ['num' => '03', 'title' => 'Beri Dampak',    'desc' => 'Ikuti kegiatan dan pantau dampak nyata yang kamu ciptakan untuk bumi.'],
             ] as $i => $step)
             <div class="relative text-center reveal" style="transition-delay:{{ $i * 120 }}ms">
                 @if($i < 2)

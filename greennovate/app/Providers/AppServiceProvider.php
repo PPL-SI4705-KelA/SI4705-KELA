@@ -19,6 +19,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Tambahkan konfigurasi global di sini jika diperlukan
     }
 }
