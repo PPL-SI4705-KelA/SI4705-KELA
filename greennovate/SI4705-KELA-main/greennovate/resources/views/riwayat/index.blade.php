@@ -211,8 +211,27 @@ function renderDetail(d) {
         </div>`;
     }
 
-    // Status Menunggu info
-    if (d.status_label === 'Menunggu' || d.status_label === 'Terdaftar') {
+    // Status Menunggu Konfirmasi info
+    if (d.status_label === 'Menunggu Konfirmasi') {
+        html += `<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:14px;margin-bottom:16px;display:flex;align-items:start;gap:10px">
+            <svg style="width:20px;height:20px;color:#1e40af;flex-shrink:0;margin-top:1px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <div><p style="font-size:0.8rem;font-weight:600;color:#1e3a8a;margin:0 0 2px">Sedang Diverifikasi</p><p style="font-size:0.75rem;color:#1e40af;margin:0">Bukti pembayaran Anda sedang diverifikasi oleh admin. Silakan tunggu.</p></div>
+        </div>`;
+    }
+
+    if (d.status_label === 'Ditolak' && (d.tipe === 'donasi' || d.tipe === 'pembelian')) {
+        html += `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:14px;margin-bottom:16px;display:flex;align-items:start;gap:10px">
+            <svg style="width:20px;height:20px;color:#dc2626;flex-shrink:0;margin-top:1px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+            <div><p style="font-size:0.8rem;font-weight:600;color:#991b1b;margin:0 0 2px">Bukti Ditolak</p><p style="font-size:0.75rem;color:#b91c1c;margin:0">Admin menolak bukti transfer Anda. Silakan unggah ulang bukti yang valid.</p>
+            <a href="/pembayaran/${d.tipe}/${d.id}" style="display:inline-block;margin-top:8px;padding:6px 12px;background:#dc2626;color:#fff;border-radius:6px;font-size:0.75rem;font-weight:600;text-decoration:none">Unggah Ulang Bukti</a></div>
+        </div>`;
+    } else if (d.status_label === 'Menunggu' && (d.tipe === 'donasi' || d.tipe === 'pembelian')) {
+        html += `<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:14px;margin-bottom:16px;display:flex;align-items:start;gap:10px">
+            <svg style="width:20px;height:20px;color:#d97706;flex-shrink:0;margin-top:1px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+            <div><p style="font-size:0.8rem;font-weight:600;color:#92400e;margin:0 0 2px">Menunggu Pembayaran</p><p style="font-size:0.75rem;color:#b45309;margin:0">Silakan lakukan pembayaran dan unggah bukti transfer.</p>
+            <a href="/pembayaran/${d.tipe}/${d.id}" style="display:inline-block;margin-top:8px;padding:6px 12px;background:#d97706;color:#fff;border-radius:6px;font-size:0.75rem;font-weight:600;text-decoration:none">Unggah Bukti Transfer</a></div>
+        </div>`;
+    } else if (d.status_label === 'Menunggu' || d.status_label === 'Terdaftar') {
         html += `<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:14px;margin-bottom:16px;display:flex;align-items:start;gap:10px">
             <svg style="width:20px;height:20px;color:#d97706;flex-shrink:0;margin-top:1px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
             <div><p style="font-size:0.8rem;font-weight:600;color:#92400e;margin:0 0 2px">Menunggu Proses</p><p style="font-size:0.75rem;color:#b45309;margin:0">Bukti dokumentasi atau hasil kegiatan belum diunggah oleh admin. Silakan tunggu update selanjutnya.</p></div>

@@ -145,7 +145,7 @@
                         class="text-gray-500 hover:text-[#0D8B41] transition-colors">
                         Kegiatan
                     </a>
-                    <a href="#" id="nav-tentang"
+                    <a href="{{ url('/#mission') }}" id="nav-tentang"
                        class="text-gray-500 hover:text-[#0D8B41] transition-colors">
                         Tentang
                     </a>
@@ -171,7 +171,7 @@
                         </a>
                     @else
                         {{-- Donasi --}}
-                        <a href="#" id="nav-donasi-link"
+                        <a href="{{ url('/kegiatan') }}" id="nav-donasi-link"
                            class="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-[#0D8B41] transition-colors px-2 py-1.5">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
