@@ -12,7 +12,6 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Petugas\PetugasDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatController;
-use App\Http\Controllers\BuktiPembayaranController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Admin\AdminChatController;
 use Illuminate\Support\Facades\Route;
@@ -56,11 +55,6 @@ Route::middleware(['auth', 'check.active'])->group(function () {
     Route::get('/riwayat', [RiwayatController::class, 'index'])->name('riwayat.index');
     Route::get('/riwayat/{tipe}/{id}/detail', [RiwayatController::class, 'detail'])->name('riwayat.detail');
     Route::get('/riwayat/{tipe}/{id}/download', [RiwayatController::class, 'download'])->name('riwayat.download');
-
-    // ── Bukti Pembayaran (PB-16 & PB-18) ──────────────────────────────────────
-    Route::get('/pembayaran/{tipe}/{id}', [BuktiPembayaranController::class, 'show'])->name('pembayaran.show');
-    Route::post('/pembayaran/{tipe}/{id}/upload', [BuktiPembayaranController::class, 'upload'])->name('pembayaran.upload');
-    Route::post('/pembayaran/{tipe}/{id}/reupload', [BuktiPembayaranController::class, 'reupload'])->name('pembayaran.reupload');
 
     // ── API Riwayat ───────────────────────────────────────────────────────
     Route::get('/api/riwayat', [RiwayatController::class, 'apiIndex'])->name('api.riwayat.index');

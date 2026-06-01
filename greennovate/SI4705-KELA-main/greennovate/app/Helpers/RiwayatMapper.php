@@ -43,8 +43,6 @@ class RiwayatMapper
         return match ($tipe) {
             'donasi', 'pembelian' => match ($status) {
                 'Pending'  => 'Menunggu',
-                'Menunggu Konfirmasi' => 'Menunggu Konfirmasi',
-                'Ditolak'  => 'Ditolak',
                 'Sukses'   => 'Sukses',
                 'Gagal'    => 'Gagal',
                 'Expired'  => 'Kedaluwarsa',
@@ -71,8 +69,6 @@ class RiwayatMapper
     {
         return match ($statusLabel) {
             'Menunggu'     => 'yellow',
-            'Menunggu Konfirmasi' => 'blue',
-            'Ditolak'      => 'red',
             'Sukses'       => 'green',
             'Gagal'        => 'red',
             'Kedaluwarsa'  => 'gray',
