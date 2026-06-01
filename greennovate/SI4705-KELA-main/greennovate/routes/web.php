@@ -115,9 +115,5 @@ Route::middleware(['auth', 'check.active'])->group(function () {
 
             Route::post('/api/kegiatan/{kegiatan}/dokumentasi', [PetugasDashboardController::class, 'uploadDokumentasi'])->name('petugas.api.dokumentasi');
         });
-
-    Route::get('/cek-dokumentasi', function () {
-        return DokumentasiKegiatan::all();
-    });
         
 });
