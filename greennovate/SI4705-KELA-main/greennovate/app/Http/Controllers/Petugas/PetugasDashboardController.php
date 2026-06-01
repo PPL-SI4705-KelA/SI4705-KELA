@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\JenisPohon;
 use App\Models\Kegiatan;
 use App\Models\Realisasi;
+use App\Models\DokumentasiKegiatan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -219,5 +220,31 @@ class PetugasDashboardController extends Controller
             });
 
         return response()->json($kegiatanAktif);
+    }
+
+    public function uploadDokumentasi(Request $request, Kegiatan $kegiatan)
+    {
+        $request->validate([
+            'foto' => 'required|array|max:3',
+            'foto.*' => 'image|mimes:jpg,jpeg,png|max:5120'
+        ]);
+
+        foreach($request->file('foto') as $file){
+
+            $path = $file->store(
+                'dokumentasi',
+                'public'
+            );
+
+            DokumentasiKegiatan::create([
+                'kegiatan_id' => $kegiatan->id,
+                'petugas_id' => Auth::id(),
+                'foto' => $path
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Dokumentasi berhasil diupload'
+        ]);
     }
 }

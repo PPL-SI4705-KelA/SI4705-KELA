@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use App\Models\DokumentasiKegiatan;
 
 class Kegiatan extends Model
 {
@@ -76,6 +77,11 @@ class Kegiatan extends Model
     public function realisasis()
     {
         return $this->hasMany(Realisasi::class, 'kegiatan_id');
+    }
+
+    public function donasis()
+    {
+        return $this->hasMany(Donasi::class, 'kegiatan_id');
     }
 
     // ── Helper ──────────────────────────────────────────────────────────────
@@ -174,6 +180,12 @@ class Kegiatan extends Model
         }
 
         return null;
+    }
+
+    public function dokumentasis()
+    {
+        return $this->hasMany(
+            DokumentasiKegiatan::class, 'kegiatan_id');
     }
 
     public function getRemainingQuotaAttribute(): int
