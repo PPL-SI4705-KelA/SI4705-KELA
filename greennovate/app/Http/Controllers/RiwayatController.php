@@ -17,7 +17,7 @@ class RiwayatController extends Controller
     /**
      * Tampilkan daftar riwayat partisipasi pengguna.
      * Mengagregasi data dari tabel donasi, pembelian, dan pendaftaran kegiatan.
-     *
+     *tes
      * GET /riwayat
      */
     public function index(Request $request)
