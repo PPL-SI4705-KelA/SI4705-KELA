@@ -112,13 +112,17 @@
                         </svg>
                         Catat Realisasi
                     </button>
-                    <button class="px-5 border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 text-[13px] font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors min-h-[44px]">
+                    <button
+                        type="button"
+                        onclick='openDokumentasiModal({{ $kegiatan->id }}, @json($kegiatan->nama))'
+                        class="px-5 border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 text-[13px] font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors min-h-[44px]">
                         <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                         Dokumentasi
                     </button>
+                    
                 </div>
             </div>
 
@@ -222,6 +226,96 @@
                 </div>
             </form>
         </div>
+    </div>
+</div>
+
+<div id="dokumentasiModal"
+     class="fixed inset-0 z-50 hidden">
+
+    <div
+        class="absolute inset-0 bg-black/40"
+        onclick="closeDokumentasiModal()">
+    </div>
+
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+
+        <div class="bg-white rounded-2xl w-full max-w-xl">
+
+            <div class="bg-green-700 text-white p-5 rounded-t-2xl">
+                <h3 class="font-bold">
+                    Upload Dokumentasi
+                </h3>
+            </div>
+
+            <form id="dokumentasiForm" class="p-5">
+
+                <input
+                    type="hidden"
+                    id="dokumentasi_kegiatan_id">
+
+                <div class="mb-4">
+
+                    <label class="block mb-2">
+                        Nama Kegiatan
+                    </label>
+
+                    <input
+                        type="text"
+                        id="dokumentasi_nama_kegiatan"
+                        readonly
+                        class="w-full border rounded-xl p-2">
+
+                </div>
+
+                <div class="mb-4">
+
+                    <label class="block mb-2">
+                        Foto Dokumentasi
+                    </label>
+
+                    <input
+                        type="file"
+                        id="foto_dokumentasi"
+                        multiple
+                        accept=".jpg,.jpeg,.png"
+                        onchange="previewDokumentasi(this)"
+                        class="w-full">
+
+                    <p class="text-xs text-gray-500 mt-1">
+                        Format: JPG, JPEG, dan PNG
+                    </p>
+                        <p class="text-xs text-gray-500 mt-1">
+                        Maksimal 3 foto setiap upload
+                    </p>
+
+                </div>
+
+                <div
+                    id="preview_container"
+                    class="grid grid-cols-3 gap-2 mb-4">
+                </div>
+
+                <div class="flex gap-2">
+
+                    <button
+                        type="button"
+                        onclick="closeDokumentasiModal()"
+                        class="flex-1 border rounded-xl py-2">
+                        Batal
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="flex-1 bg-green-700 text-white rounded-xl py-2">
+                        Upload
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
     </div>
 </div>
 
@@ -351,6 +445,153 @@
             pctEl.textContent = data.progress + '% tercapai';
             pctEl.className = data.progress < 50 ? 'text-[11px] font-medium text-orange-500' : 'text-[11px] font-medium text-gray-400';
         }
+    }
+    function openDokumentasiModal(kegiatanId, nama)
+    {
+        document.getElementById(
+            'dokumentasi_kegiatan_id'
+        ).value = kegiatanId;
+
+        document.getElementById(
+            'dokumentasi_nama_kegiatan'
+        ).value = nama;
+
+        document.getElementById(
+            'preview_container'
+        ).innerHTML = '';
+
+        document.getElementById(
+            'dokumentasiModal'
+        ).classList.remove('hidden');
+    }
+
+    function closeDokumentasiModal()
+    {
+        document.getElementById(
+            'dokumentasiModal'
+        ).classList.add('hidden');
+    }
+
+    function previewDokumentasi(input)
+    {
+        const files = input.files;
+
+        const container =
+            document.getElementById(
+                'preview_container'
+            );
+
+        container.innerHTML = '';
+
+        if(files.length > 3)
+        {
+            Swal.fire({
+                icon:'warning',
+                title:'Maksimal 3 Foto',
+                text:'Setiap upload maksimal 3 foto.'
+            });
+
+            input.value='';
+
+            return;
+        }
+
+        Array.from(files).forEach(file => {
+
+            const reader = new FileReader();
+
+            reader.onload = function(e){
+
+                container.innerHTML += `
+                    <img
+                        src="${e.target.result}"
+                        class="h-28 w-full object-cover rounded-lg border">
+                `;
+            };
+
+            reader.readAsDataURL(file);
+
+        });
+    }
+
+    const dokumentasiForm =
+    document.getElementById('dokumentasiForm');
+
+    if(dokumentasiForm){
+
+        dokumentasiForm.addEventListener(
+            'submit',
+            async function(e){
+
+                e.preventDefault();
+
+                const kegiatanId =
+                document.getElementById(
+                    'dokumentasi_kegiatan_id'
+                ).value;
+
+                const files =
+                document.getElementById(
+                    'foto_dokumentasi'
+                ).files;
+
+                const formData =
+                new FormData();
+
+                Array.from(files)
+                .forEach(file => {
+                    formData.append(
+                        'foto[]',
+                        file
+                    );
+                });
+
+                const response =
+                await fetch(
+                    `/petugas/api/kegiatan/${kegiatanId}/dokumentasi`,
+                    {
+                        method:'POST',
+                        headers:{
+                            'X-CSRF-TOKEN':CSRF_TOKEN,
+                            'Accept':'application/json'
+                        },
+                        body:formData
+                    }
+                );
+
+                const data =
+                await response.json();
+
+                if(response.ok){
+
+                    document.getElementById('dokumentasiForm').reset();
+
+                    document.getElementById(
+                        'preview_container'
+                    ).innerHTML = '';
+
+                    closeDokumentasiModal();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Upload Berhasil!',
+                        text: data.message ?? 'Dokumentasi kegiatan berhasil ditambahkan.',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#15803d'
+                    });
+
+                }
+                else {
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Upload Gagal',
+                        text: data.message ?? 'Terjadi kesalahan saat mengupload dokumentasi.'
+                    });
+
+                }
+            }
+        );
     }
 
     // Auto-refresh dashboard every 5 minutes (AC-7, Exception 4)
