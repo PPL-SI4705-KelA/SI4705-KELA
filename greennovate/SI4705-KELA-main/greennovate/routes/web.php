@@ -12,8 +12,6 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Petugas\PetugasDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatController;
-use App\Http\Controllers\DonationController;
-use App\Http\Controllers\PembelianController;
 use Illuminate\Support\Facades\Route;
 use App\Models\DokumentasiKegiatan;
 
@@ -71,34 +69,6 @@ Route::middleware(['auth', 'check.active'])->group(function () {
     Route::get('/api/riwayat', [RiwayatController::class, 'apiIndex'])->name('api.riwayat.index');
     Route::get('/api/riwayat/{tipe}/{id}/detail', [RiwayatController::class, 'apiDetail'])->name('api.riwayat.detail');
 
-    // ── Fitur Donasi Pengguna Umum (Validasi Ganda) ───────────────────────────
-    Route::prefix('donasi')->name('donations.')->group(function () {
-        // 1. Halaman Utama / Form Input Donasi (Scenario 1)
-        Route::get('/', [DonationController::class, 'index'])->name('index'); // Terdaftar sebagai: donations.index
-        
-        // 2. Submit Form & Proses Validasi Pertama (Scenario 2)
-        Route::post('/proses', [DonationController::class, 'prosesValidasiPertama'])->name('proses'); // Terdaftar sebagai: donations.proses
-        
-        // 3. Halaman Ringkasan / Konfirmasi Donasi
-        // UBAH bagian ->name('donations.confirmation') MENJADI ->name('confirmation')
-        Route::get('/confirmation', [DonationController::class, 'confirmation'])->name('confirmation'); // Terdaftar sebagai: donations.confirmation
-        
-        // 4. Proses Validasi Kedua & Pembuatan Transaksi Pending (Scenario 3)
-        Route::post('/lanjut-pembayaran', [DonationController::class, 'lanjutPembayaran'])->name('submit'); // Terdaftar sebagai: donations.submit
-        
-        // 5. Halaman Pilih Metode Pembayaran
-        Route::get('/pembayaran/{donasi}', [DonationController::class, 'payment'])->name('payment'); // Terdaftar sebagai: donations.payment
-
-        // Upload Bukti Pembayaran
-        Route::post('/pembayaran/{donasi}/upload-bukti', [DonationController::class, 'uploadBuktiPembayaran'])->name('upload-proof');
-    });
-    Route::get('/cek-status', function () {
-    return DB::table('donasis')
-        ->select('status')
-        ->distinct()
-        ->get();
-    });
-    
     // ── Admin routes ──────────────────────────────────────────────────────────
     Route::middleware('is.admin')
         ->prefix('admin')
@@ -108,6 +78,12 @@ Route::middleware(['auth', 'check.active'])->group(function () {
             Route::resource('kegiatan', AdminKegiatanController::class);
             Route::resource('lokasi', LokasiLahanController::class);
             Route::resource('jenis-pohon', JenisPohonController::class)->except(['show']);
+
+            // ── Chat (Admin) ──────────────────────────────────────────────────
+            Route::get('/chat', [AdminChatController::class, 'index'])->name('chat.index');
+            Route::get('/chat/{conversation}', [AdminChatController::class, 'show'])->name('chat.show');
+            Route::post('/chat/{conversation}/reply', [AdminChatController::class, 'reply'])->name('chat.reply');
+            Route::get('/chat/{conversation}/messages', [AdminChatController::class, 'getMessages'])->name('chat.messages');
         });
 
     // ── Petugas routes (PB-21) ────────────────────────────────────────────────

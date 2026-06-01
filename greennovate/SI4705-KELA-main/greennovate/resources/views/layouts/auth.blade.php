@@ -51,8 +51,11 @@
 
                         <!-- Avatar -->
                         <button @click="open = !open"
-                            class="w-10 h-10 rounded-full bg-[#1b7b43] flex items-center justify-center text-white font-bold cursor-pointer focus:outline-none">
+                            class="relative w-10 h-10 rounded-full bg-[#1b7b43] flex items-center justify-center text-white font-bold cursor-pointer focus:outline-none">
                             {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                            @if(isset($unreadChatCount) && $unreadChatCount > 0)
+                                <span class="absolute top-0 right-0 inline-flex items-center justify-center w-3.5 h-3.5 text-[9px] font-bold text-white bg-red-500 border-2 border-[#Fdfdfc] rounded-full"></span>
+                            @endif
                         </button>
 
                         <!-- Dropdown Menu -->
@@ -78,6 +81,13 @@
                             <a href="{{ route('profile.edit') }}"
                                 class="block px-4 py-2 text-sm hover:bg-gray-100">
                                 {{ __('Profile') }}
+                            </a>
+                            <a href="{{ route('chat.index') }}"
+                                class="block px-4 py-2 text-sm hover:bg-gray-100 text-green-700 flex justify-between items-center">
+                                <span>{{ __('Hubungi Admin') }}</span>
+                                @if(isset($unreadChatCount) && $unreadChatCount > 0)
+                                    <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $unreadChatCount }}</span>
+                                @endif
                             </a>
 
                             <form method="POST" action="{{ route('logout') }}">
