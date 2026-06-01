@@ -78,6 +78,11 @@ class Kegiatan extends Model
         return $this->hasMany(Realisasi::class, 'kegiatan_id');
     }
 
+    public function dokumentasis()
+    {
+        return $this->hasMany(Dokumentasi::class, 'kegiatan_id');
+    }
+
     // ── Scopes ──────────────────────────────────────────────────────────────
 
     public function scopeAssignedToPetugas($query, $petugasId)

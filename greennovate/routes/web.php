@@ -92,6 +92,7 @@ Route::middleware(['auth', 'check.active'])->group(function () {
             // API endpoints
             Route::get('/api/jenis-pohon', [PetugasDashboardController::class, 'getJenisPohon'])->name('api.jenis-pohon');
             Route::post('/api/kegiatan/{kegiatan}/realisasi', [PetugasDashboardController::class, 'storeRealisasi'])->name('api.store-realisasi');
+            Route::post('/api/kegiatan/{kegiatan}/dokumentasi', [PetugasDashboardController::class, 'storeDokumentasi'])->name('api.store-dokumentasi');
             Route::get('/api/dashboard', [PetugasDashboardController::class, 'apiDashboard'])->name('api.dashboard');
         });
 });

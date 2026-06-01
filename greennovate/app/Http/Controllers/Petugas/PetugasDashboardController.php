@@ -7,6 +7,7 @@ use App\Models\JenisPohon;
 use App\Models\Kegiatan;
 use App\Models\Pembelian;
 use App\Models\Realisasi;
+use App\Models\Dokumentasi;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -336,5 +337,48 @@ class PetugasDashboardController extends Controller
     public function triggersWarning($jumlah_tertanam, $kegiatan)
     {
         return $jumlah_tertanam > $kegiatan->target_pohon;
+    }
+
+    /**
+     * Menyimpan file dokumentasi untuk kegiatan (Khusus gambar).
+     */
+    public function storeDokumentasi(Request $request, Kegiatan $kegiatan)
+    {
+        $user = Auth::user();
+
+        // Validasi petugas memiliki akses ke kegiatan ini
+        if ($kegiatan->petugas_id !== $user->id) {
+            return response()->json([
+                'message' => 'Anda tidak memiliki akses ke kegiatan ini.',
+            ], 403);
+        }
+
+        $request->validate([
+            'foto' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+        ], [
+            'foto.required' => 'Pilih file foto dokumentasi.',
+            'foto.image' => 'File harus berupa gambar.',
+            'foto.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif.',
+            'foto.max' => 'Ukuran gambar maksimal 5MB.',
+        ]);
+
+        if ($request->hasFile('foto')) {
+            $path = $request->file('foto')->store('dokumentasi', 'public');
+            
+            $dokumentasi = Dokumentasi::create([
+                'kegiatan_id' => $kegiatan->id,
+                'petugas_id' => $user->id,
+                'file_path' => $path,
+            ]);
+
+            return response()->json([
+                'message' => 'Dokumentasi berhasil diunggah!',
+                'dokumentasi' => $dokumentasi
+            ], 200);
+        }
+
+        return response()->json([
+            'message' => 'Gagal mengunggah dokumentasi.'
+        ], 400);
     }
 }
