@@ -138,7 +138,7 @@
             </div>
 
             {{-- Galeri Dokumentasi --}}
-            @if($kegiatan->dokumentasis->count() > 0)
+            @if($kegiatan->dokumentasis && $kegiatan->dokumentasis->count() > 0)
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-5 flex items-center gap-2">
                     <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

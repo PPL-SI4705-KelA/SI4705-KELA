@@ -13,6 +13,7 @@ use App\Http\Controllers\Petugas\PetugasDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RiwayatController;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\PembelianController;
 use Illuminate\Support\Facades\Route;
 use App\Models\DokumentasiKegiatan;
 
@@ -40,6 +41,15 @@ Route::middleware(['auth', 'check.active'])->group(function () {
 
     // Dispatcher: Mengarahkan user ke dashboard sesuai role masing-masing
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // ── Fitur Kontribusi Penanaman Pohon ──────────────────────────────────────
+    Route::get('/pembelian', [PembelianController::class, 'index'])->name('pembelian.index');
+    Route::post('/pembelian/checkout', [PembelianController::class, 'checkout'])->name('pembelian.checkout');
+    Route::get('/pembelian/invoice/{id}', [PembelianController::class, 'invoice'])->name('pembelian.invoice');
+    Route::post(
+    '/pembelian/upload-bukti/{id}',
+    [PembelianController::class, 'uploadBukti']
+)->name('pembelian.upload-bukti');
 
     // ── Kegiatan - hanya form daftar yang butuh login ─────────────────────────
     Route::get('/kegiatan/{slug}/daftar', [KegiatanController::class, 'showDaftarForm'])->name('kegiatan.daftar.form');
