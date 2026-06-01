@@ -1,0 +1,250 @@
+<?php
+
+namespace App\Http\Controllers\Petugas;
+
+use App\Http\Controllers\Controller;
+use App\Models\JenisPohon;
+use App\Models\Kegiatan;
+use App\Models\Realisasi;
+use App\Models\DokumentasiKegiatan;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class PetugasDashboardController extends Controller
+{
+    /**
+     * PB-21 – AC-1, AC-2, AC-3: Dashboard utama Petugas.
+     * Menampilkan greeting, kegiatan aktif, dan ringkasan progress.
+     */
+    public function index()
+    {
+        $user = Auth::user();
+
+        // Greeting berdasarkan waktu (AC-1)
+        $hour = (int) Carbon::now()->format('H');
+        if ($hour >= 5 && $hour < 12) {
+            $greeting = 'Selamat Pagi';
+        } elseif ($hour >= 12 && $hour < 15) {
+            $greeting = 'Selamat Siang';
+        } elseif ($hour >= 15 && $hour < 18) {
+            $greeting = 'Selamat Sore';
+        } else {
+            $greeting = 'Selamat Malam';
+        }
+
+        // Kegiatan aktif: status Berlangsung & Persiapan (AC-2)
+        $kegiatanAktif = Kegiatan::with('lokasiLahan')
+            ->where('petugas_id', $user->id)
+            ->whereIn('status', ['Berlangsung', 'Persiapan'])
+            ->get()
+            ->sortBy(function ($k) {
+                // AC-3: Sorting priority – Berlangsung first, then Persiapan
+                $statusOrder = match ($k->status) {
+                    'Berlangsung' => 0,
+                    'Persiapan'   => 1,
+                    default       => 2,
+                };
+                // Within same status: nearest date first, then lowest progress
+                $progress = $k->target_pohon > 0
+                    ? ($k->realisasi_pohon / $k->target_pohon) * 100
+                    : 0;
+                return [$statusOrder, $k->tanggal?->timestamp ?? 0, $progress];
+            })
+            ->values();
+
+        return view('petugas.dashboard', compact('user', 'greeting', 'kegiatanAktif'));
+    }
+
+    /**
+     * PB-21 – AC-4, AC-5: Halaman Semua Kegiatan (list lengkap dengan search/filter/pagination).
+     */
+    public function semuaKegiatan(Request $request)
+    {
+        $user  = Auth::user();
+        $query = Kegiatan::with('lokasiLahan')
+            ->where('petugas_id', $user->id);
+
+        // Search by nama kegiatan (AC-5)
+        if ($request->filled('search')) {
+            $query->where('nama', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter by status (AC-5)
+        if ($request->filled('status') && $request->status !== 'Semua') {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by lokasi (AC-5)
+        if ($request->filled('lokasi')) {
+            $query->where('lokasi_lahan_id', $request->lokasi);
+        }
+
+        // Sort: default by status priority then date
+        $query->orderByRaw("CASE status WHEN 'Berlangsung' THEN 1 WHEN 'Persiapan' THEN 2 WHEN 'Selesai' THEN 3 WHEN 'Dibatalkan' THEN 4 ELSE 5 END")
+              ->orderBy('tanggal', 'asc');
+
+        $perPage   = $request->input('per_page', 20);
+        $kegiatans = $query->paginate($perPage)->appends($request->query());
+
+        // Get unique lokasi for filter dropdown
+        $lokasiList = Kegiatan::where('petugas_id', $user->id)
+            ->with('lokasiLahan')
+            ->get()
+            ->pluck('lokasiLahan')
+            ->filter()
+            ->unique('id')
+            ->values();
+
+        return view('petugas.semua-kegiatan', compact('kegiatans', 'lokasiList'));
+    }
+
+    /**
+     * PB-21 – AC-6: API untuk mendapatkan jenis pohon aktif (dropdown Catat Realisasi).
+     */
+    public function getJenisPohon()
+    {
+        $jenisPohons = JenisPohon::active()
+            ->orderBy('nama')
+            ->get(['id', 'nama', 'nama_latin', 'harga']);
+
+        return response()->json($jenisPohons);
+    }
+
+    /**
+     * PB-21 – AC-6: Simpan realisasi pencatatan pohon.
+     */
+    public function storeRealisasi(Request $request, Kegiatan $kegiatan)
+    {
+        $user = Auth::user();
+
+        // Authorization: pastikan kegiatan milik petugas ini
+        if ($kegiatan->petugas_id !== $user->id) {
+            return response()->json([
+                'message' => 'Anda tidak memiliki akses ke kegiatan ini.',
+            ], 403);
+        }
+
+        // Validasi status kegiatan
+        if (!in_array($kegiatan->status, ['Berlangsung', 'Persiapan'])) {
+            return response()->json([
+                'message' => 'Kegiatan ini tidak dapat menerima realisasi (status: ' . $kegiatan->status . ').',
+            ], 422);
+        }
+
+        $validated = $request->validate([
+            'jenis_pohon_id' => 'required|exists:jenis_pohons,id',
+            'jumlah'         => 'required|integer|min:1|max:10000',
+            'catatan'        => 'nullable|string|max:500',
+        ], [
+            'jenis_pohon_id.required' => 'Pilih jenis pohon.',
+            'jenis_pohon_id.exists'   => 'Jenis pohon tidak valid.',
+            'jumlah.required'         => 'Masukkan jumlah pohon.',
+            'jumlah.min'              => 'Jumlah pohon minimal 1.',
+            'jumlah.max'              => 'Jumlah pohon maksimal 10.000.',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Simpan realisasi
+            $realisasi = Realisasi::create([
+                'kegiatan_id'    => $kegiatan->id,
+                'petugas_id'     => $user->id,
+                'jenis_pohon_id' => $validated['jenis_pohon_id'],
+                'jumlah'         => $validated['jumlah'],
+                'catatan'        => $validated['catatan'] ?? null,
+                'recorded_at'    => Carbon::now(),
+            ]);
+
+            // Update realisasi_pohon di kegiatan
+            $kegiatan->increment('realisasi_pohon', $validated['jumlah']);
+            $kegiatan->refresh();
+
+            DB::commit();
+
+            // Hitung progress baru
+            $newProgress = $kegiatan->target_pohon > 0
+                ? min(100, round(($kegiatan->realisasi_pohon / $kegiatan->target_pohon) * 100))
+                : 0;
+
+            return response()->json([
+                'message'         => 'Realisasi berhasil dicatat!',
+                'realisasi_pohon' => $kegiatan->realisasi_pohon,
+                'target_pohon'    => $kegiatan->target_pohon,
+                'progress'        => $newProgress,
+                'jumlah_dicatat'  => $validated['jumlah'],
+                'petugas_nama'    => $user->name,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('PB-21: Gagal menyimpan realisasi', [
+                'kegiatan_id' => $kegiatan->id,
+                'petugas_id'  => $user->id,
+                'error'       => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat menyimpan realisasi. Silakan coba lagi.',
+            ], 500);
+        }
+    }
+
+    /**
+     * PB-21 – API: Data dashboard untuk polling / refresh.
+     */
+    public function apiDashboard()
+    {
+        $user = Auth::user();
+
+        $kegiatanAktif = Kegiatan::with('lokasiLahan')
+            ->where('petugas_id', $user->id)
+            ->whereIn('status', ['Berlangsung', 'Persiapan'])
+            ->get()
+            ->map(function ($k) {
+                $progress = $k->target_pohon > 0
+                    ? min(100, round(($k->realisasi_pohon / $k->target_pohon) * 100))
+                    : 0;
+                return [
+                    'id'              => $k->id,
+                    'nama'            => $k->nama,
+                    'lokasi'          => $k->lokasiLahan?->alamat ?? '-',
+                    'tanggal'         => $k->tanggal?->format('d F Y'),
+                    'status'          => $k->status,
+                    'target_pohon'    => $k->target_pohon,
+                    'realisasi_pohon' => $k->realisasi_pohon,
+                    'progress'        => $progress,
+                ];
+            });
+
+        return response()->json($kegiatanAktif);
+    }
+
+    public function uploadDokumentasi(Request $request, Kegiatan $kegiatan)
+    {
+        $request->validate([
+            'foto' => 'required|array|max:3',
+            'foto.*' => 'image|mimes:jpg,jpeg,png|max:5120'
+        ]);
+
+        foreach($request->file('foto') as $file){
+
+            $path = $file->store(
+                'dokumentasi',
+                'public'
+            );
+
+            DokumentasiKegiatan::create([
+                'kegiatan_id' => $kegiatan->id,
+                'petugas_id' => Auth::id(),
+                'foto' => $path
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Dokumentasi berhasil diupload'
+        ]);
+    }
+}
