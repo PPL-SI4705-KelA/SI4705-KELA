@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminChatController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\JenisPohonController;
 use App\Http\Controllers\Admin\KegiatanController as AdminKegiatanController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Petugas\PetugasDashboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\RiwayatController;
 use Illuminate\Support\Facades\Route;
 use App\Models\DokumentasiKegiatan;
