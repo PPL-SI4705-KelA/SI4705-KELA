@@ -18,7 +18,10 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-800 mb-2">Pilih Lokasi Penanaman Lahan</label>
-                        <select name="lokasi_lahan_id" required 
+                        <select
+                            dusk="lokasi"
+                            name="lokasi_lahan_id"
+                            required 
                                 class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#0D8B41] focus:bg-white transition-all">
                             <option value="" disabled selected>-- Pilih Lokasi Bekas Tambang --</option>
                             @foreach($lokasiLahans as $lahan)
@@ -29,7 +32,12 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-800 mb-2">Pilih Jenis Pohon</label>
-                        <select name="jenis_pohon_id" id="jenis_pohon_id" required onchange="kalkulasiBiaya()"
+                        <select
+                            dusk="jenis-pohon"
+                            name="jenis_pohon_id"
+                            id="jenis_pohon_id"
+                            required
+                            onchange="kalkulasiBiaya()"
                                 class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#0D8B41] focus:bg-white transition-all">
                             <option value="" disabled selected>-- Pilih Jenis Pohon --</option>
                             @foreach($jenisPohons as $pohon)
@@ -68,7 +76,10 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full bg-[#0D8B41] hover:bg-[#085c2b] text-white font-semibold py-4 px-6 rounded-full transition-all text-center text-sm hover:shadow-lg hover:shadow-green-900/20">
+                    <button
+                        dusk="btn-checkout"
+                        type="submit" 
+                        class="w-full bg-[#0D8B41] hover:bg-[#085c2b] text-white font-semibold py-4 px-6 rounded-full transition-all text-center text-sm hover:shadow-lg hover:shadow-green-900/20">
                         Buat Pesanan & Invoice
                     </button>
                 </form>

@@ -78,6 +78,7 @@
                 </label>
 
                <input
+                    dusk="bukti-transfer"
                     type="file"
                     name="bukti_transfer"
                     id="bukti_transfer"
@@ -91,6 +92,7 @@
                 </p>
 
                 <button
+                    dusk="btn-upload"
                     type="submit"
                     class="mt-5 bg-[#0D8B41] hover:bg-[#086432] text-white px-6 py-3 rounded-xl">
                     Kirim Bukti Pembayaran
@@ -105,7 +107,8 @@
 </div>
 
 <script>
-document.getElementById('bukti_transfer').addEventListener('change', function() {
+document.getElementById('bukti_transfer')
+.addEventListener('change', function () {
 
     const file = this.files[0];
 
@@ -116,7 +119,8 @@ document.getElementById('bukti_transfer').addEventListener('change', function() 
         'image/png'
     ];
 
-    const errorText = document.getElementById('error-file');
+    const errorText =
+        document.getElementById('error-file');
 
     if (!allowedTypes.includes(file.type)) {
 
@@ -124,15 +128,13 @@ document.getElementById('bukti_transfer').addEventListener('change', function() 
 
         this.value = '';
 
-        alert('File ditolak! Hanya JPG atau PNG yang diperbolehkan.');
-
     } else {
 
         errorText.classList.add('hidden');
 
     }
-
 });
+
 </script>
 
 @endsection
