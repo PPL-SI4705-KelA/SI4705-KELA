@@ -105,24 +105,20 @@
 
                 {{-- Action Buttons (AC-6) --}}
                 <div class="flex gap-3">
-                    <button onclick="openRealisasiModal({{ $kegiatan->id }}, '{{ addslashes($kegiatan->nama) }}', '{{ addslashes($kegiatan->lokasiLahan?->alamat ?? '-') }}')"
+                    <a href="{{ route('petugas.realisasi', ['kegiatan_id' => $kegiatan->id]) }}"
                             class="flex-1 bg-[#1a8245] hover:bg-green-800 text-white text-[13px] font-semibold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors min-h-[44px]">
                         <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                         </svg>
                         Catat Realisasi
-                    </button>
-                    <button
-                        type="button"
-                        onclick='openDokumentasiModal({{ $kegiatan->id }}, @json($kegiatan->nama))'
-                        class="px-5 border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 text-[13px] font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors min-h-[44px]">
+                    </a>
+                    <button type="button" onclick="openDokumentasiModal({{ $kegiatan->id }}, '{{ addslashes($kegiatan->nama) }}')" class="px-5 border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 text-[13px] font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors min-h-[44px]">
                         <svg class="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                         Dokumentasi
                     </button>
-                    
                 </div>
             </div>
 
@@ -229,93 +225,59 @@
     </div>
 </div>
 
-<div id="dokumentasiModal"
-     class="fixed inset-0 z-50 hidden">
-
-    <div
-        class="absolute inset-0 bg-black/40"
-        onclick="closeDokumentasiModal()">
-    </div>
-
+{{-- Modal: Upload Dokumentasi --}}
+<div id="dokumentasiModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeDokumentasiModal()"></div>
     <div class="absolute inset-0 flex items-center justify-center p-4">
-
-        <div class="bg-white rounded-2xl w-full max-w-xl">
-
-            <div class="bg-green-700 text-white p-5 rounded-t-2xl">
-                <h3 class="font-bold">
-                    Upload Dokumentasi
-                </h3>
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md relative animate-modal-in overflow-hidden">
+            {{-- Modal Header --}}
+            <div class="bg-gradient-to-r from-[#1a8245] to-[#15803d] p-5 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="font-bold text-lg">Upload Dokumentasi</h3>
+                        <p class="text-green-100 text-sm mt-0.5">Unggah foto kegiatan penanaman</p>
+                    </div>
+                    <button onclick="closeDokumentasiModal()" class="p-1.5 hover:bg-white/20 rounded-lg transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
-            <form id="dokumentasiForm" class="p-5">
-
-                <input
-                    type="hidden"
-                    id="dokumentasi_kegiatan_id">
+            <form id="dokumentasiForm" class="p-5" enctype="multipart/form-data">
+                <input type="hidden" id="dok_modal_kegiatan_id">
 
                 <div class="mb-4">
-
-                    <label class="block mb-2">
-                        Nama Kegiatan
-                    </label>
-
-                    <input
-                        type="text"
-                        id="dokumentasi_nama_kegiatan"
-                        readonly
-                        class="w-full border rounded-xl p-2">
-
+                    <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Kegiatan</label>
+                    <input type="text" id="dok_modal_nama_kegiatan" readonly
+                           class="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 font-medium">
                 </div>
 
-                <div class="mb-4">
-
-                    <label class="block mb-2">
-                        Foto Dokumentasi
-                    </label>
-
-                    <input
-                        type="file"
-                        id="foto_dokumentasi"
-                        multiple
-                        accept=".jpg,.jpeg,.png"
-                        onchange="previewDokumentasi(this)"
-                        class="w-full">
-
-                    <p class="text-xs text-gray-500 mt-1">
-                        Format: JPG, JPEG, dan PNG
-                    </p>
-                        <p class="text-xs text-gray-500 mt-1">
-                        Maksimal 3 foto setiap upload
-                    </p>
-
+                <div class="mb-5">
+                    <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Pilih Foto (Gambar Saja) <span class="text-red-400">*</span></label>
+                    <input type="file" id="dok_modal_foto" accept="image/png, image/jpeg, image/jpg, image/gif" required
+                           class="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all">
+                    <p id="error_dok_foto" class="text-xs text-red-500 mt-1 hidden"></p>
+                    <p class="text-[11px] text-gray-400 mt-1.5">Format: JPG, PNG, GIF. Maksimal 5MB.</p>
                 </div>
 
-                <div
-                    id="preview_container"
-                    class="grid grid-cols-3 gap-2 mb-4">
-                </div>
-
-                <div class="flex gap-2">
-
-                    <button
-                        type="button"
-                        onclick="closeDokumentasiModal()"
-                        class="flex-1 border rounded-xl py-2">
+                {{-- Buttons --}}
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeDokumentasiModal()"
+                            class="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 font-semibold text-sm rounded-xl hover:bg-gray-50 transition-colors min-h-[44px]">
                         Batal
                     </button>
-
-                    <button
-                        type="submit"
-                        class="flex-1 bg-green-700 text-white rounded-xl py-2">
+                    <button type="submit" id="btnSubmitDokumentasi"
+                            class="flex-1 px-4 py-2.5 bg-[#1a8245] text-white font-semibold text-sm rounded-xl hover:bg-green-800 transition-colors flex items-center justify-center gap-2 min-h-[44px]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                        </svg>
                         Upload
                     </button>
-
                 </div>
-
             </form>
-
         </div>
-
     </div>
 </div>
 
@@ -446,153 +408,72 @@
             pctEl.className = data.progress < 50 ? 'text-[11px] font-medium text-orange-500' : 'text-[11px] font-medium text-gray-400';
         }
     }
-    function openDokumentasiModal(kegiatanId, nama)
-    {
-        document.getElementById(
-            'dokumentasi_kegiatan_id'
-        ).value = kegiatanId;
 
-        document.getElementById(
-            'dokumentasi_nama_kegiatan'
-        ).value = nama;
-
-        document.getElementById(
-            'preview_container'
-        ).innerHTML = '';
-
-        document.getElementById(
-            'dokumentasiModal'
-        ).classList.remove('hidden');
+    function openDokumentasiModal(kegiatanId, nama) {
+        document.getElementById('dok_modal_kegiatan_id').value = kegiatanId;
+        document.getElementById('dok_modal_nama_kegiatan').value = nama;
+        document.getElementById('dok_modal_foto').value = '';
+        
+        document.getElementById('error_dok_foto').classList.add('hidden');
+        document.getElementById('dokumentasiModal').classList.remove('hidden');
     }
 
-    function closeDokumentasiModal()
-    {
-        document.getElementById(
-            'dokumentasiModal'
-        ).classList.add('hidden');
+    function closeDokumentasiModal() {
+        document.getElementById('dokumentasiModal').classList.add('hidden');
     }
 
-    function previewDokumentasi(input)
-    {
-        const files = input.files;
+    // Dokumentasi form submit
+    document.getElementById('dokumentasiForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnSubmitDokumentasi');
+        const kegiatanId = document.getElementById('dok_modal_kegiatan_id').value;
+        const fotoInput = document.getElementById('dok_modal_foto');
 
-        const container =
-            document.getElementById(
-                'preview_container'
-            );
+        document.getElementById('error_dok_foto').classList.add('hidden');
 
-        container.innerHTML = '';
-
-        if(files.length > 3)
-        {
-            Swal.fire({
-                icon:'warning',
-                title:'Maksimal 3 Foto',
-                text:'Setiap upload maksimal 3 foto.'
-            });
-
-            input.value='';
-
+        if (!fotoInput.files[0]) {
+            document.getElementById('error_dok_foto').textContent = 'Silakan pilih foto terlebih dahulu.';
+            document.getElementById('error_dok_foto').classList.remove('hidden');
             return;
         }
 
-        Array.from(files).forEach(file => {
+        const formData = new FormData();
+        formData.append('foto', fotoInput.files[0]);
 
-            const reader = new FileReader();
+        btn.disabled = true;
+        btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg> Mengunggah...';
 
-            reader.onload = function(e){
+        try {
+            const url = '{{ url("petugas/api/kegiatan") }}/' + kegiatanId + '/dokumentasi';
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'Accept': 'application/json' 
+                },
+                body: formData
+            });
 
-                container.innerHTML += `
-                    <img
-                        src="${e.target.result}"
-                        class="h-28 w-full object-cover rounded-lg border">
-                `;
-            };
+            const data = await res.json();
 
-            reader.readAsDataURL(file);
-
-        });
-    }
-
-    const dokumentasiForm =
-    document.getElementById('dokumentasiForm');
-
-    if(dokumentasiForm){
-
-        dokumentasiForm.addEventListener(
-            'submit',
-            async function(e){
-
-                e.preventDefault();
-
-                const kegiatanId =
-                document.getElementById(
-                    'dokumentasi_kegiatan_id'
-                ).value;
-
-                const files =
-                document.getElementById(
-                    'foto_dokumentasi'
-                ).files;
-
-                const formData =
-                new FormData();
-
-                Array.from(files)
-                .forEach(file => {
-                    formData.append(
-                        'foto[]',
-                        file
-                    );
-                });
-
-                const response =
-                await fetch(
-                    `/petugas/api/kegiatan/${kegiatanId}/dokumentasi`,
-                    {
-                        method:'POST',
-                        headers:{
-                            'X-CSRF-TOKEN':CSRF_TOKEN,
-                            'Accept':'application/json'
-                        },
-                        body:formData
-                    }
-                );
-
-                const data =
-                await response.json();
-
-                if(response.ok){
-
-                    document.getElementById('dokumentasiForm').reset();
-
-                    document.getElementById(
-                        'preview_container'
-                    ).innerHTML = '';
-
-                    closeDokumentasiModal();
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Upload Berhasil!',
-                        text: data.message ?? 'Dokumentasi kegiatan berhasil ditambahkan.',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#15803d'
-                    });
-
-                }
-                else {
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Upload Gagal',
-                        text: data.message ?? 'Terjadi kesalahan saat mengupload dokumentasi.'
-                    });
-
+            if (res.ok) {
+                closeDokumentasiModal();
+                showToast(data.message || 'Dokumentasi berhasil diunggah!', 'success');
+            } else {
+                if (data.errors && data.errors.foto) {
+                    document.getElementById('error_dok_foto').textContent = data.errors.foto[0];
+                    document.getElementById('error_dok_foto').classList.remove('hidden');
+                } else {
+                    showToast(data.message || 'Gagal mengunggah dokumentasi.', 'error');
                 }
             }
-        );
-    }
+        } catch (err) {
+            showToast('Terjadi kesalahan jaringan. Coba lagi.', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg> Upload';
+        }
+    });
 
     // Auto-refresh dashboard every 5 minutes (AC-7, Exception 4)
     setInterval(() => {

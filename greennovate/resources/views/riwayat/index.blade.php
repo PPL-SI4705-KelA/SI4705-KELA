@@ -194,16 +194,13 @@ function renderDetail(d) {
                 <tr><td style="padding:6px 0;color:#6b7280;width:40%">Nama</td><td style="padding:6px 0;font-weight:600;color:#111827">${d.nama}</td></tr>
                 <tr><td style="padding:6px 0;color:#6b7280">Tanggal</td><td style="padding:6px 0;font-weight:600;color:#111827">${d.tanggal}</td></tr>`;
 
-    if (d.nama_donatur) html += `<tr><td style="padding:6px 0;color:#6b7280">Penyumbang</td><td style="padding:6px 0;font-weight:600;color:#111827">${d.nama_donatur}</td></tr>`;
-    if (d.nomor_hp && d.nomor_hp !== '-') html += `<tr><td style="padding:6px 0;color:#6b7280">Nomor HP</td><td style="padding:6px 0;color:#111827">${d.nomor_hp}</td></tr>`;
-    if (d.nama_kegiatan && d.nama_kegiatan !== '-') html += `<tr><td style="padding:6px 0;color:#6b7280">Kegiatan</td><td style="padding:6px 0;color:#111827">${d.nama_kegiatan}</td></tr>`;
-    if (d.lokasi_kegiatan && d.lokasi_kegiatan !== '-') html += `<tr><td style="padding:6px 0;color:#6b7280">Lokasi</td><td style="padding:6px 0;color:#111827">${d.lokasi_kegiatan}</td></tr>`;
-    if (d.jumlah_pohon) html += `<tr><td style="padding:6px 0;color:#6b7280">Jumlah Pohon</td><td style="padding:6px 0;font-weight:600;color:#0D8B41">${d.jumlah_pohon} pohon</td></tr>`;
-    if (d.jumlah) html += `<tr><td style="padding:6px 0;color:#6b7280">Nominal</td><td style="padding:6px 0;font-weight:600;color:#0D8B41">${d.jumlah}</td></tr>`;
+    if (d.jumlah) html += `<tr><td style="padding:6px 0;color:#6b7280">Jumlah</td><td style="padding:6px 0;font-weight:600;color:#0D8B41">${d.jumlah}</td></tr>`;
+    if (d.pohon_tertanam !== undefined && d.pohon_tertanam !== null) html += `<tr><td style="padding:6px 0;color:#6b7280">Pohon Tertanam</td><td style="padding:6px 0;font-weight:600;color:#0D8B41">${d.pohon_tertanam} Pohon</td></tr>`;
     if (d.metode) html += `<tr><td style="padding:6px 0;color:#6b7280">Metode</td><td style="padding:6px 0;color:#111827">${d.metode}</td></tr>`;
     if (d.tanggal_kegiatan) html += `<tr><td style="padding:6px 0;color:#6b7280">Tanggal Kegiatan</td><td style="padding:6px 0;color:#111827">${d.tanggal_kegiatan}</td></tr>`;
+    if (d.lokasi) html += `<tr><td style="padding:6px 0;color:#6b7280">Lokasi</td><td style="padding:6px 0;color:#111827">${d.lokasi}</td></tr>`;
     if (d.nama_lengkap) html += `<tr><td style="padding:6px 0;color:#6b7280">Nama Peserta</td><td style="padding:6px 0;color:#111827">${d.nama_lengkap}</td></tr>`;
-    if (d.catatan) html += `<tr><td style="padding:6px 0;color:#6b7280">Pesan</td><td style="padding:6px 0;color:#111827;font-style:italic">"${d.catatan}"</td></tr>`;
+    if (d.catatan) html += `<tr><td style="padding:6px 0;color:#6b7280">Catatan</td><td style="padding:6px 0;color:#111827">${d.catatan}</td></tr>`;
 
     html += `</table></div>`;
 

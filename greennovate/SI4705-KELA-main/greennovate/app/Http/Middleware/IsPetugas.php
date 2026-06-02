@@ -19,11 +19,10 @@ class IsPetugas
             return $next($request);
         }
 
-        // If not petugas, check if admin (admins usually can access everything, but maybe let's just restrict strictly or redirect to respective dashboards)
-        if (auth()->check() && auth()->user()->role === 'admin') {
-            return redirect()->route('admin.dashboard');
+        if (auth()->check()) {
+            abort(403, 'Forbidden');
         }
 
-        return redirect('/')->with('error', 'Akses ditolak. Anda tidak memiliki izin untuk halaman tersebut.');
+        return redirect()->route('login');
     }
 }

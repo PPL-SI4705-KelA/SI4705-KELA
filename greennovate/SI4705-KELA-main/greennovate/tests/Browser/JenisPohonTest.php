@@ -66,8 +66,8 @@ class JenisPohonTest extends DuskTestCase
                 ->press('Simpan')
 
                 // Assert sukses
+                ->waitForText('Jenis pohon berhasil ditambahkan.')
                 ->assertPathIs('/admin/jenis-pohon')
-                ->assertSee('Jenis pohon berhasil ditambahkan.')
                 ->assertSee('Trembesi Dusk');
         });
     }
@@ -100,8 +100,8 @@ class JenisPohonTest extends DuskTestCase
                 ->press('Simpan')
 
                 // Assert sukses
-                ->assertPathIs('/admin/jenis-pohon')
-                ->assertSee('Jenis pohon berhasil diperbarui.');
+                ->waitForText('Jenis pohon berhasil diperbarui.')
+                ->assertPathIs('/admin/jenis-pohon');
         });
     }
 
@@ -130,8 +130,8 @@ class JenisPohonTest extends DuskTestCase
                 ->acceptDialog()
 
                 // Assert sukses
+                ->waitForText('Jenis pohon berhasil dihapus.')
                 ->assertPathIs('/admin/jenis-pohon')
-                ->assertSee('Jenis pohon berhasil dihapus.')
                 ->assertDontSee('Sengon Hapus'); // Pastikan sudah tidak ada di tabel
         });
     }

@@ -17,7 +17,7 @@ class RiwayatController extends Controller
     /**
      * Tampilkan daftar riwayat partisipasi pengguna.
      * Mengagregasi data dari tabel donasi, pembelian, dan pendaftaran kegiatan.
-     *tes
+     *
      * GET /riwayat
      */
     public function index(Request $request)
@@ -35,17 +35,17 @@ class RiwayatController extends Controller
             $donasis = Donasi::where('user_id', $user->id)->get();
             foreach ($donasis as $d) {
                 $riwayatItems->push([
-                    'id' => $d->id,
-                    'tipe' => 'donasi',
-                    'tipe_label' => RiwayatMapper::tipeLabel('donasi'),
-                    'tipe_color' => RiwayatMapper::tipeColor('donasi'),
-                    'nama' => $d->nama_donasi,
-                    'tanggal' => $d->created_at,
-                    'status_raw' => $d->status,
+                    'id'           => $d->id,
+                    'tipe'         => 'donasi',
+                    'tipe_label'   => RiwayatMapper::tipeLabel('donasi'),
+                    'tipe_color'   => RiwayatMapper::tipeColor('donasi'),
+                    'nama'         => $d->nama_donasi,
+                    'tanggal'      => $d->created_at,
+                    'status_raw'   => $d->status,
                     'status_label' => RiwayatMapper::statusMapper($d->status, 'donasi'),
                     'status_color' => RiwayatMapper::statusColor(RiwayatMapper::statusMapper($d->status, 'donasi')),
-                    'kode' => $d->kode_transaksi,
-                    'detail' => 'Rp ' . number_format((float)($d->jumlah ?? 0), 0, ',', '.'),
+                    'kode'         => $d->kode_transaksi,
+                    'detail'       => 'Rp ' . number_format((float)($d->jumlah ?? 0), 0, ',', '.'),
                 ]);
             }
         }
@@ -55,17 +55,17 @@ class RiwayatController extends Controller
             $pembelians = Pembelian::where('user_id', $user->id)->get();
             foreach ($pembelians as $p) {
                 $riwayatItems->push([
-                    'id' => $p->id,
-                    'tipe' => 'pembelian',
-                    'tipe_label' => RiwayatMapper::tipeLabel('pembelian'),
-                    'tipe_color' => RiwayatMapper::tipeColor('pembelian'),
-                    'nama' => $p->nama_item,
-                    'tanggal' => $p->created_at,
-                    'status_raw' => $p->status,
+                    'id'           => $p->id,
+                    'tipe'         => 'pembelian',
+                    'tipe_label'   => RiwayatMapper::tipeLabel('pembelian'),
+                    'tipe_color'   => RiwayatMapper::tipeColor('pembelian'),
+                    'nama'         => $p->nama_item,
+                    'tanggal'      => $p->created_at,
+                    'status_raw'   => $p->status,
                     'status_label' => RiwayatMapper::statusMapper($p->status, 'pembelian'),
                     'status_color' => RiwayatMapper::statusColor(RiwayatMapper::statusMapper($p->status, 'pembelian')),
-                    'kode' => $p->kode_transaksi,
-                    'detail' => 'Rp ' . number_format((float)($p->total_harga ?? 0), 0, ',', '.'),
+                    'kode'         => $p->kode_transaksi,
+                    'detail'       => 'Rp ' . number_format((float)($p->total_harga ?? 0), 0, ',', '.'),
                 ]);
             }
         }
@@ -77,17 +77,17 @@ class RiwayatController extends Controller
                 ->get();
             foreach ($pendaftarans as $pk) {
                 $riwayatItems->push([
-                    'id' => $pk->id,
-                    'tipe' => 'kegiatan',
-                    'tipe_label' => RiwayatMapper::tipeLabel('kegiatan'),
-                    'tipe_color' => RiwayatMapper::tipeColor('kegiatan'),
-                    'nama' => $pk->kegiatan->nama ?? 'Kegiatan Tidak Ditemukan',
-                    'tanggal' => $pk->created_at,
-                    'status_raw' => $pk->status,
+                    'id'           => $pk->id,
+                    'tipe'         => 'kegiatan',
+                    'tipe_label'   => RiwayatMapper::tipeLabel('kegiatan'),
+                    'tipe_color'   => RiwayatMapper::tipeColor('kegiatan'),
+                    'nama'         => $pk->kegiatan->nama ?? 'Kegiatan Tidak Ditemukan',
+                    'tanggal'      => $pk->created_at,
+                    'status_raw'   => $pk->status,
                     'status_label' => RiwayatMapper::statusMapper($pk->status, 'kegiatan'),
                     'status_color' => RiwayatMapper::statusColor(RiwayatMapper::statusMapper($pk->status, 'kegiatan')),
-                    'kode' => 'KGT-' . str_pad($pk->id, 6, '0', STR_PAD_LEFT),
-                    'detail' => $pk->kegiatan->tanggal ? $pk->kegiatan->tanggal->translatedFormat('d F Y') : '-',
+                    'kode'         => 'KGT-' . str_pad($pk->id, 6, '0', STR_PAD_LEFT),
+                    'detail'       => $pk->kegiatan->tanggal ? $pk->kegiatan->tanggal->translatedFormat('d F Y') : '-',
                 ]);
             }
         }
@@ -104,9 +104,9 @@ class RiwayatController extends Controller
 
         // Manual pagination
         $perPage = 10;
-        $page = $request->input('page', 1);
-        $total = $riwayatItems->count();
-        $items = $riwayatItems->forPage($page, $perPage);
+        $page    = $request->input('page', 1);
+        $total   = $riwayatItems->count();
+        $items   = $riwayatItems->forPage($page, $perPage);
         $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
             $items,
             $total,
@@ -117,7 +117,7 @@ class RiwayatController extends Controller
 
         return view('riwayat.index', [
             'riwayatItems' => $paginator,
-            'filterTipe' => $filterTipe,
+            'filterTipe'   => $filterTipe,
             'filterStatus' => $filterStatus,
         ]);
     }
@@ -134,43 +134,44 @@ class RiwayatController extends Controller
 
         switch ($tipe) {
             case 'donasi':
-                $record = Donasi::where('id', $id)->where('user_id', $user->id)
+                $record = Donasi::where('id', $id)
+                    ->where('user_id', $user->id)
                     ->with('kegiatan')
                     ->first();
                 if (!$record)
                     abort(404, 'Data riwayat tidak ditemukan.');
 
                 $data = [
-                    'id'             => $record->id,
-                    'tipe'           => 'donasi',
-                    'tipe_label'     => 'Donasi',
-                    'nama'           => $record->nama_donasi,
+                    'id'              => $record->id,
+                    'tipe'            => 'donasi',
+                    'tipe_label'      => 'Donasi',
+                    'nama'            => $record->nama_donasi,
 
                     // Data donatur
-                    'nama_donatur'   => $record->nama_donatur ?? $user->name,
-                    'nomor_hp'       => $record->nomor_hp ?? '-',
+                    'nama_donatur'    => $record->nama_donatur ?? $user->name,
+                    'nomor_hp'        => $record->nomor_hp ?? '-',
 
                     // Data kegiatan
-                    'nama_kegiatan'  => $record->kegiatan?->nama ?? '-',
-                    'lokasi_kegiatan'=> $record->kegiatan?->lokasLahan?->nama ?? '-',
+                    'nama_kegiatan'   => $record->kegiatan?->nama ?? '-',
+                    'lokasi_kegiatan' => $record->kegiatan?->lokasLahan?->nama ?? '-',
 
                     // Jumlah pohon (dari nama_donasi jika ada, atau estimasi dari jumlah)
-                    'jumlah_pohon'   => $record->jumlah_pohon ?? null,
+                    'jumlah_pohon'    => $record->jumlah_pohon ?? null,
 
-                    'tanggal'        => $record->created_at->translatedFormat('d F Y, H:i'),
-                    'status_label'   => RiwayatMapper::statusMapper($record->status, 'donasi'),
-                    'status_color'   => RiwayatMapper::statusColor(RiwayatMapper::statusMapper($record->status, 'donasi')),
-                    'kode'           => $record->kode_transaksi,
-                    'jumlah'         => 'Rp ' . number_format((float)($record->jumlah ?? 0), 0, ',', '.'),
-                    'metode'         => $record->metode_pembayaran ?? '-',
-                    'catatan'        => $record->catatan,
-                    'has_qr'         => false,
-                    'qr_url'         => null,
-                    'has_dokumentasi'=> $record->hasDokumentasi(),
-                    'dokumentasi_url'=> $record->hasDokumentasi()
+                    'tanggal'         => $record->created_at->translatedFormat('d F Y, H:i'),
+                    'status_label'    => RiwayatMapper::statusMapper($record->status, 'donasi'),
+                    'status_color'    => RiwayatMapper::statusColor(RiwayatMapper::statusMapper($record->status, 'donasi')),
+                    'kode'            => $record->kode_transaksi,
+                    'jumlah'          => 'Rp ' . number_format((float)($record->jumlah ?? 0), 0, ',', '.'),
+                    'metode'          => $record->metode_pembayaran ?? '-',
+                    'catatan'         => $record->catatan,
+                    'has_qr'          => false,
+                    'qr_url'          => null,
+                    'has_dokumentasi' => $record->hasDokumentasi(),
+                    'dokumentasi_url' => $record->hasDokumentasi()
                         ? route('riwayat.download', ['tipe' => 'donasi', 'id' => $record->id])
                         : null,
-                    'has_sertifikat' => false,
+                    'has_sertifikat'  => false,
                 ];
                 break;
 
@@ -179,27 +180,42 @@ class RiwayatController extends Controller
                 if (!$record)
                     abort(404, 'Data riwayat tidak ditemukan.');
 
+                // Hitung pohon tertanam berdasarkan jenis pohon yang cocok dengan nama item
+                $pohon_tertanam  = 0;
+                $jenisPohons     = \App\Models\JenisPohon::all();
+                $matchedJenisPohon = null;
+                foreach ($jenisPohons as $jp) {
+                    if (stripos($record->nama_item, $jp->nama) !== false) {
+                        $matchedJenisPohon = $jp;
+                        break;
+                    }
+                }
+                if ($matchedJenisPohon) {
+                    $pohon_tertanam = \App\Models\Realisasi::where('jenis_pohon_id', $matchedJenisPohon->id)->sum('jumlah');
+                }
+
                 $data = [
-                    'id' => $record->id,
-                    'tipe' => 'pembelian',
-                    'tipe_label' => 'Pembelian',
-                    'nama' => $record->nama_item,
-                    'tanggal' => $record->created_at->translatedFormat('d F Y, H:i'),
-                    'status_label' => RiwayatMapper::statusMapper($record->status, 'pembelian'),
-                    'status_color' => RiwayatMapper::statusColor(RiwayatMapper::statusMapper($record->status, 'pembelian')),
-                    'kode' => $record->kode_transaksi,
-                    'jumlah' => 'Rp ' . number_format((float)($record->total_harga ?? 0), 0, ',', '.'),
-                    'jumlah_item' => $record->jumlah_item,
-                    'catatan' => $record->catatan,
-                    'has_qr' => $record->hasQrCode(),
-                    'qr_url' => $record->hasQrCode()
+                    'id'              => $record->id,
+                    'tipe'            => 'pembelian',
+                    'tipe_label'      => 'Pembelian',
+                    'nama'            => $record->nama_item,
+                    'tanggal'         => $record->created_at->translatedFormat('d F Y, H:i'),
+                    'status_label'    => RiwayatMapper::statusMapper($record->status, 'pembelian'),
+                    'status_color'    => RiwayatMapper::statusColor(RiwayatMapper::statusMapper($record->status, 'pembelian')),
+                    'kode'            => $record->kode_transaksi,
+                    'jumlah'          => 'Rp ' . number_format((float)($record->total_harga ?? 0), 0, ',', '.'),
+                    'jumlah_item'     => $record->jumlah_item,
+                    'pohon_tertanam'  => $pohon_tertanam,
+                    'catatan'         => $record->catatan,
+                    'has_qr'          => $record->hasQrCode(),
+                    'qr_url'          => $record->hasQrCode()
                         ? asset('storage/' . $record->qr_code)
                         : null,
                     'has_dokumentasi' => $record->hasDokumentasi(),
                     'dokumentasi_url' => $record->hasDokumentasi()
                         ? route('riwayat.download', ['tipe' => 'pembelian', 'id' => $record->id])
                         : null,
-                    'has_sertifikat' => false,
+                    'has_sertifikat'  => false,
                 ];
                 break;
 
@@ -212,31 +228,32 @@ class RiwayatController extends Controller
                     abort(404, 'Data riwayat tidak ditemukan.');
 
                 $data = [
-                    'id' => $record->id,
-                    'tipe' => 'kegiatan',
-                    'tipe_label' => 'Kegiatan',
-                    'nama' => $record->kegiatan->nama ?? 'Kegiatan Tidak Ditemukan',
-                    'tanggal' => $record->created_at->translatedFormat('d F Y, H:i'),
+                    'id'               => $record->id,
+                    'tipe'             => 'kegiatan',
+                    'tipe_label'       => 'Kegiatan',
+                    'nama'             => $record->kegiatan->nama ?? 'Kegiatan Tidak Ditemukan',
+                    'tanggal'          => $record->created_at->translatedFormat('d F Y, H:i'),
                     'tanggal_kegiatan' => $record->kegiatan->tanggal
                         ? $record->kegiatan->tanggal->translatedFormat('d F Y')
                         : '-',
-                    'lokasi' => $record->kegiatan->lokasiLahan->nama ?? '-',
-                    'status_label' => RiwayatMapper::statusMapper($record->status, 'kegiatan'),
-                    'status_color' => RiwayatMapper::statusColor(RiwayatMapper::statusMapper($record->status, 'kegiatan')),
-                    'kode' => 'KGT-' . str_pad($record->id, 6, '0', STR_PAD_LEFT),
-                    'nama_lengkap' => $record->nama_lengkap,
-                    'no_hp' => $record->no_hp,
-                    'catatan' => $record->catatan,
-                    'has_qr' => $record->hasQrCode(),
-                    'qr_url' => $record->hasQrCode()
+                    'lokasi'           => $record->kegiatan->lokasiLahan->nama ?? '-',
+                    'status_label'     => RiwayatMapper::statusMapper($record->status, 'kegiatan'),
+                    'status_color'     => RiwayatMapper::statusColor(RiwayatMapper::statusMapper($record->status, 'kegiatan')),
+                    'kode'             => 'KGT-' . str_pad($record->id, 6, '0', STR_PAD_LEFT),
+                    'nama_lengkap'     => $record->nama_lengkap,
+                    'no_hp'            => $record->no_hp,
+                    'pohon_tertanam'   => $record->kegiatan ? ($record->kegiatan->realisasi_pohon ?? 0) : 0,
+                    'catatan'          => $record->catatan,
+                    'has_qr'           => $record->hasQrCode(),
+                    'qr_url'           => $record->hasQrCode()
                         ? asset('storage/' . $record->qr_code)
                         : null,
-                    'has_dokumentasi' => $record->hasDokumentasi(),
-                    'dokumentasi_url' => $record->hasDokumentasi()
+                    'has_dokumentasi'  => $record->hasDokumentasi(),
+                    'dokumentasi_url'  => $record->hasDokumentasi()
                         ? route('riwayat.download', ['tipe' => 'kegiatan', 'id' => $record->id])
                         : null,
-                    'has_sertifikat' => $record->hasSertifikat(),
-                    'sertifikat_url' => $record->hasSertifikat()
+                    'has_sertifikat'   => $record->hasSertifikat(),
+                    'sertifikat_url'   => $record->hasSertifikat()
                         ? route('riwayat.download', ['tipe' => 'kegiatan', 'id' => $record->id, 'file' => 'sertifikat'])
                         : null,
                 ];
@@ -257,7 +274,7 @@ class RiwayatController extends Controller
      */
     public function download(Request $request, string $tipe, int $id)
     {
-        $user = Auth::user();
+        $user     = Auth::user();
         $filePath = null;
         $fileName = 'dokumentasi';
 
@@ -302,7 +319,7 @@ class RiwayatController extends Controller
             return back()->with('error', 'File dokumentasi tidak ditemukan di server. Silakan hubungi admin untuk informasi lebih lanjut.');
         }
 
-        $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+        $extension    = pathinfo($filePath, PATHINFO_EXTENSION);
         $downloadName = $fileName . '.' . $extension;
 
         return response()->download(Storage::disk('public')->path($filePath), $downloadName);
@@ -317,20 +334,20 @@ class RiwayatController extends Controller
      */
     public function apiIndex(Request $request)
     {
-        $user = Auth::user();
-        $filterTipe = $request->input('tipe');
+        $user        = Auth::user();
+        $filterTipe  = $request->input('tipe');
         $riwayatItems = collect();
 
         if (!$filterTipe || $filterTipe === 'donasi') {
             $donasis = Donasi::where('user_id', $user->id)->get();
             foreach ($donasis as $d) {
                 $riwayatItems->push([
-                    'id' => $d->id,
-                    'tipe' => 'donasi',
-                    'nama' => $d->nama_donasi,
+                    'id'      => $d->id,
+                    'tipe'    => 'donasi',
+                    'nama'    => $d->nama_donasi,
                     'tanggal' => $d->created_at->toIso8601String(),
-                    'status' => RiwayatMapper::statusMapper($d->status, 'donasi'),
-                    'kode' => $d->kode_transaksi,
+                    'status'  => RiwayatMapper::statusMapper($d->status, 'donasi'),
+                    'kode'    => $d->kode_transaksi,
                 ]);
             }
         }
@@ -339,12 +356,12 @@ class RiwayatController extends Controller
             $pembelians = Pembelian::where('user_id', $user->id)->get();
             foreach ($pembelians as $p) {
                 $riwayatItems->push([
-                    'id' => $p->id,
-                    'tipe' => 'pembelian',
-                    'nama' => $p->nama_item,
+                    'id'      => $p->id,
+                    'tipe'    => 'pembelian',
+                    'nama'    => $p->nama_item,
                     'tanggal' => $p->created_at->toIso8601String(),
-                    'status' => RiwayatMapper::statusMapper($p->status, 'pembelian'),
-                    'kode' => $p->kode_transaksi,
+                    'status'  => RiwayatMapper::statusMapper($p->status, 'pembelian'),
+                    'kode'    => $p->kode_transaksi,
                 ]);
             }
         }
@@ -354,20 +371,20 @@ class RiwayatController extends Controller
                 ->with('kegiatan')->get();
             foreach ($pendaftarans as $pk) {
                 $riwayatItems->push([
-                    'id' => $pk->id,
-                    'tipe' => 'kegiatan',
-                    'nama' => $pk->kegiatan->nama ?? '-',
+                    'id'      => $pk->id,
+                    'tipe'    => 'kegiatan',
+                    'nama'    => $pk->kegiatan->nama ?? '-',
                     'tanggal' => $pk->created_at->toIso8601String(),
-                    'status' => RiwayatMapper::statusMapper($pk->status, 'kegiatan'),
-                    'kode' => 'KGT-' . str_pad($pk->id, 6, '0', STR_PAD_LEFT),
+                    'status'  => RiwayatMapper::statusMapper($pk->status, 'kegiatan'),
+                    'kode'    => 'KGT-' . str_pad($pk->id, 6, '0', STR_PAD_LEFT),
                 ]);
             }
         }
 
-        $sorted = $riwayatItems->sortByDesc('tanggal')->values();
+        $sorted  = $riwayatItems->sortByDesc('tanggal')->values();
 
-        $perPage = $request->input('per_page', 10);
-        $page = $request->input('page', 1);
+        $perPage   = $request->input('per_page', 10);
+        $page      = $request->input('page', 1);
         $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
             $sorted->forPage($page, $perPage)->values(),
             $sorted->count(),
