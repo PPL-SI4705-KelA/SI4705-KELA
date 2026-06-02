@@ -46,6 +46,26 @@
                 @else
                     <a href="{{ route('dashboard') }}" class="text-gray-500 hover:text-black">{{ __('Dashboard') }}</a>
 
+            <a href="{{ route('notifikasi.index') }}" class="relative text-gray-500 hover:text-black">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                @php $unreadCount = \App\Models\Notifikasi::where('user_id', Auth::id())->where('is_read', 'false')->count(); @endphp
+                @if($unreadCount > 0)
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">
+                        {{ $unreadCount > 9 ? '9+' : $unreadCount }}
+                    </span>
+                @endif
+            </a>
+
+            <a href="{{ route('nama_route_achievement_anda') }}" class="relative text-gray-500 hover:text-black flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+                <span>Achievement</span>
+            </a>       
+
                     <!-- Profile Dropdown (Menggunakan Alpine.js) -->
                     <div class="relative" x-data="{ open: false }">
 
@@ -71,6 +91,22 @@
                             </div>
 
                             <!-- Menu Links -->
+                            <a href="{{ route('riwayat.index') }}"
+                                class="block px-4 py-2 text-sm hover:bg-gray-100">
+                                {{ __('Riwayat') }}
+                            </a>
+
+                            {{-- ← TAMBAHKAN DI SINI --}}
+<a href="{{ route('notifikasi.index') }}" class="block px-4 py-2 text-sm hover:bg-gray-100 flex items-center justify-between">
+    <span>🔔 Notifikasi</span>
+    @if($unreadCount > 0)
+        <span class="bg-red-500 text-white text-xs rounded-full px-1.5">{{ $unreadCount }}</span>
+    @endif
+</a>
+<a href="{{ route('achievement.index') }}" class="block px-4 py-2 text-sm hover:bg-gray-100">
+    🏆 Achievement
+</a>
+
                             <a href="{{ route('profile.edit') }}"
                                 class="block px-4 py-2 text-sm hover:bg-gray-100">
                                 {{ __('Profile') }}

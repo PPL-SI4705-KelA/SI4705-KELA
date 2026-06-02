@@ -30,6 +30,9 @@ class Kegiatan extends Model
         'image',
         'registration_open_at',
         'registration_close_at',
+        'tipe_kegiatan',
+        'estimasi_pohon',
+        'target_dana'
     ];
 
     protected $casts = [
@@ -40,6 +43,9 @@ class Kegiatan extends Model
         'realisasi_pohon'       => 'integer',
         'quota'                 => 'integer',
         'registered_count'      => 'integer',
+        'tipe_kegiatan'         => 'string',
+        'estimasi_pohon'        => 'integer',
+        'target_dana'           => 'decimal:2',
     ];
 
     // ── Boot: Auto-generate slug saat kegiatan dibuat ────────────────────────
@@ -71,6 +77,11 @@ class Kegiatan extends Model
     public function petugas()
     {
         return $this->belongsTo(User::class, 'petugas_id');
+    }
+
+    public function realisasis()
+    {
+        return $this->hasMany(Realisasi::class, 'kegiatan_id');
     }
 
     // ── Helper ──────────────────────────────────────────────────────────────

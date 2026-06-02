@@ -100,6 +100,20 @@ class KegiatanController extends Controller
             'pernyataan.accepted' => 'Anda harus menyetujui ketentuan yang berlaku.',
         ]);
 
+        // Simpan ke tabel pendaftaran kegiatan untuk riwayat partisipasi (PB-11)
+        \App\Models\PendaftaranKegiatan::updateOrCreate(
+            [
+                'user_id'     => Auth::id(),
+                'kegiatan_id' => $kegiatan->id,
+            ],
+            [
+                'nama_lengkap' => $request->nama_lengkap,
+                'no_hp'        => $request->no_hp,
+                'alamat'       => $request->alamat,
+                'status'       => 'Terdaftar',
+            ]
+        );
+
         $kegiatan->increment('registered_count');
 
         return redirect()

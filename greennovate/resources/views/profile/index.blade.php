@@ -52,6 +52,59 @@
         </div>
 
         {{-- ROLE --}}
+        <div class="mt-8 border-t pt-6">
+    <h2 class="text-lg font-bold text-gray-800 mb-4">🌿 Kontribusi O2 Saya</h2>
+
+    @php
+        $o2Stats = \App\Models\UserO2Stat::where('user_id', Auth::id())->first();
+    @endphp
+
+    @if($o2Stats && $o2Stats->total_o2_kg_per_bulan > 0)
+    <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="bg-green-50 rounded-xl p-4 text-center">
+            <p class="text-2xl font-bold text-green-700">{{ number_format($o2Stats->total_o2_kg_per_bulan, 1) }}</p>
+            <p class="text-xs text-green-600 mt-0.5">kg O2 / bulan</p>
+        </div>
+        <div class="bg-teal-50 rounded-xl p-4 text-center">
+            <p class="text-2xl font-bold text-teal-700">{{ number_format($o2Stats->total_pohon, 2) }}</p>
+            <p class="text-xs text-teal-600 mt-0.5">pohon berkontribusi</p>
+        </div>
+    </div>
+
+    {{-- Badge diraih --}}
+    @php
+        $badges = \App\Models\UserAchievement::where('user_id', Auth::id())
+            ->with('achievement')
+            ->orderBy('diraih_pada', 'desc')
+            ->get();
+    @endphp
+    @if($badges->count() > 0)
+    <p class="text-sm font-semibold text-gray-600 mb-2">Badge Diraih:</p>
+    <div class="flex flex-wrap gap-2">
+        @foreach($badges as $ua)
+        <div class="flex items-center gap-1.5 bg-white border border-green-200 rounded-full px-3 py-1.5 shadow-sm"
+             title="{{ $ua->achievement->pesan_dampak }}">
+            <span class="text-lg">{{ $ua->achievement->badge_icon }}</span>
+            <span class="text-xs font-semibold text-gray-700">{{ $ua->achievement->nama }}</span>
+        </div>
+        @endforeach
+    </div>
+    @endif
+
+    <a href="{{ route('achievement.index') }}"
+       class="inline-block mt-3 text-sm text-green-600 hover:text-green-700 font-medium">
+        Lihat semua achievement →
+    </a>
+
+    @else
+    <div class="bg-gray-50 rounded-xl p-4 text-center border border-dashed border-gray-200">
+        <p class="text-gray-500 text-sm">Belum ada kontribusi O2.</p>
+        <a href="{{ route('kegiatan.index') }}" class="text-sm text-green-600 font-medium hover:underline mt-1 inline-block">
+            Donasi ke kegiatan pohon untuk memulai →
+        </a>
+    </div>
+    @endif
+</div>
         <div class="mt-6">
             <p class="text-sm text-gray-500">Role</p>
             <p class="font-semibold uppercase">{{ Auth::user()->role }}</p>

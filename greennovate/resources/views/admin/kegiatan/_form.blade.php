@@ -125,3 +125,38 @@
               class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm
                      focus:outline-none focus:ring-2 focus:ring-green-500 resize-none">{{ old('deskripsi', $kegiatan->deskripsi ?? '') }}</textarea>
 </div>
+
+{{-- Tipe Kegiatan --}}
+<div class="mb-4">
+    <label for="tipe_kegiatan" class="block text-sm font-medium text-gray-700 mb-1">
+        Tipe Kegiatan <span class="text-red-500">*</span>
+    </label>
+    <select name="tipe_kegiatan" id="tipe_kegiatan"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-green-500 focus:border-green-500"
+            onchange="togglePohonFields(this.value)">
+        <option value="lainnya"     {{ old('tipe_kegiatan', $kegiatan->tipe_kegiatan ?? '') === 'lainnya'     ? 'selected' : '' }}>Lainnya</option>
+        <option value="tanam_pohon" {{ old('tipe_kegiatan', $kegiatan->tipe_kegiatan ?? '') === 'tanam_pohon' ? 'selected' : '' }}>🌱 Tanam Pohon</option>
+        <option value="beli_pohon"  {{ old('tipe_kegiatan', $kegiatan->tipe_kegiatan ?? '') === 'beli_pohon'  ? 'selected' : '' }}>🛒 Beli Pohon</option>
+    </select>
+</div>
+<div id="pohon-fields" class="{{ in_array(old('tipe_kegiatan', $kegiatan->tipe_kegiatan ?? 'lainnya'), ['tanam_pohon','beli_pohon']) ? '' : 'hidden' }}">
+    <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Estimasi Pohon</label>
+            <input type="number" name="estimasi_pohon" min="1"
+                   value="{{ old('estimasi_pohon', $kegiatan->estimasi_pohon ?? '') }}"
+                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Target Dana (Rp)</label>
+            <input type="number" name="target_dana" min="1"
+                   value="{{ old('target_dana', $kegiatan->target_dana ?? '') }}"
+                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+        </div>
+    </div>
+</div>
+<script>
+function togglePohonFields(val) {
+    document.getElementById('pohon-fields').classList.toggle('hidden', val === 'lainnya');
+}
+</script>

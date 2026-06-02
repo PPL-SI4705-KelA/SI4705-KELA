@@ -94,4 +94,23 @@ class User extends Authenticatable
     {
         return in_array($this->role, (array) $roles);
     }
+
+    // -------------------------------------------------------
+    // Relationships untuk Riwayat Partisipasi (PB-11)
+    // -------------------------------------------------------
+
+    public function donasis()
+    {
+        return $this->hasMany(Donasi::class);
+    }
+
+    public function pembelians()
+    {
+        return $this->hasMany(Pembelian::class);
+    }
+
+    public function pendaftaranKegiatans()
+    {
+        return $this->hasMany(PendaftaranKegiatan::class);
+    }
 }

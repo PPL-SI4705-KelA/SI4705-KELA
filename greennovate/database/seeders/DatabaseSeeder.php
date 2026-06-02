@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
                 'name'      => 'Admin Greennovate',
                 'password'  => Hash::make('QWERTY12345'),
                 'role'      => User::ROLE_ADMIN,
-                'is_active' => true,
+                'is_active' => 'true',
             ]
         );
 
@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
                 'name'      => 'Petugas Greennovate',
                 'password'  => Hash::make('petugas123'),
                 'role'      => User::ROLE_PETUGAS,
-                'is_active' => true,
+                'is_active' => 'true',
             ]
         );
 
@@ -50,13 +50,14 @@ class DatabaseSeeder extends Seeder
                 'name'      => 'User Biasa',
                 'password'  => Hash::make('user12345'),
                 'role'      => User::ROLE_USER,
-                'is_active' => true,
+                'is_active' => 'true',
             ]
         );
 
         // ── Seeder tambahan ────────────────────────────────────────────────────
         $this->call([
             KegiatanSeeder::class,
+            JenisPohonSeeder::class,
         ]);
     }
 }
