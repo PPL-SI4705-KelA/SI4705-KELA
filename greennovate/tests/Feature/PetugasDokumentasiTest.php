@@ -17,7 +17,7 @@ class PetugasDokumentasiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Buat user role petugas
         $this->petugas = User::factory()->create([
             'role' => 'petugas',
@@ -48,12 +48,12 @@ class PetugasDokumentasiTest extends TestCase
         $file = UploadedFile::fake()->image('dokumentasi.jpg');
 
         $response = $this->actingAs($this->petugas)
-                         ->postJson(route('petugas.api.store-dokumentasi', $this->kegiatan->id), [
-                             'foto' => $file,
-                         ]);
+            ->postJson(route('petugas.api.store-dokumentasi', $this->kegiatan->id), [
+                'foto' => $file,
+            ]);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment(['message' => 'Dokumentasi berhasil diunggah!']);
+            ->assertJsonFragment(['message' => 'Dokumentasi berhasil diunggah!']);
 
         $this->assertDatabaseHas('dokumentasis', [
             'kegiatan_id' => $this->kegiatan->id,
@@ -72,13 +72,13 @@ class PetugasDokumentasiTest extends TestCase
         $file = UploadedFile::fake()->create('document.pdf', 1000, 'application/pdf');
 
         $response = $this->actingAs($this->petugas)
-                         ->postJson(route('petugas.api.store-dokumentasi', $this->kegiatan->id), [
-                             'foto' => $file,
-                         ]);
+            ->postJson(route('petugas.api.store-dokumentasi', $this->kegiatan->id), [
+                'foto' => $file,
+            ]);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['foto']);
-                 
+            ->assertJsonValidationErrors(['foto']);
+
         $this->assertDatabaseEmpty('dokumentasis');
     }
 
@@ -90,11 +90,11 @@ class PetugasDokumentasiTest extends TestCase
         $file = UploadedFile::fake()->image('dokumentasi.jpg');
 
         $response = $this->actingAs($petugasLain)
-                         ->postJson(route('petugas.api.store-dokumentasi', $this->kegiatan->id), [
-                             'foto' => $file,
-                         ]);
+            ->postJson(route('petugas.api.store-dokumentasi', $this->kegiatan->id), [
+                'foto' => $file,
+            ]);
 
         $response->assertStatus(403)
-                 ->assertJsonFragment(['message' => 'Anda tidak memiliki akses ke kegiatan ini.']);
+            ->assertJsonFragment(['message' => 'Anda tidak memiliki akses ke kegiatan ini.']);
     }
 }
