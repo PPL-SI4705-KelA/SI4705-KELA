@@ -17,7 +17,7 @@ class RiwayatController extends Controller
     /**
      * Tampilkan daftar riwayat partisipasi pengguna.
      * Mengagregasi data dari tabel donasi, pembelian, dan pendaftaran kegiatan.
-     *
+     *tes
      * GET /riwayat
      */
     public function index(Request $request)
@@ -134,26 +134,40 @@ class RiwayatController extends Controller
 
         switch ($tipe) {
             case 'donasi':
-                $record = Donasi::where('id', $id)->where('user_id', $user->id)->first();
+                $record = Donasi::where('id', $id)->where('user_id', $user->id)
+                    ->with('kegiatan')
+                    ->first();
                 if (!$record)
                     abort(404, 'Data riwayat tidak ditemukan.');
 
                 $data = [
-                    'id' => $record->id,
-                    'tipe' => 'donasi',
-                    'tipe_label' => 'Donasi',
-                    'nama' => $record->nama_donasi,
-                    'tanggal' => $record->created_at->translatedFormat('d F Y, H:i'),
-                    'status_label' => RiwayatMapper::statusMapper($record->status, 'donasi'),
-                    'status_color' => RiwayatMapper::statusColor(RiwayatMapper::statusMapper($record->status, 'donasi')),
-                    'kode' => $record->kode_transaksi,
-                    'jumlah' => 'Rp ' . number_format((float)($record->jumlah ?? 0), 0, ',', '.'),
-                    'metode' => $record->metode_pembayaran ?? '-',
-                    'catatan' => $record->catatan,
-                    'has_qr' => false,
-                    'qr_url' => null,
-                    'has_dokumentasi' => $record->hasDokumentasi(),
-                    'dokumentasi_url' => $record->hasDokumentasi()
+                    'id'             => $record->id,
+                    'tipe'           => 'donasi',
+                    'tipe_label'     => 'Donasi',
+                    'nama'           => $record->nama_donasi,
+
+                    // Data donatur
+                    'nama_donatur'   => $record->nama_donatur ?? $user->name,
+                    'nomor_hp'       => $record->nomor_hp ?? '-',
+
+                    // Data kegiatan
+                    'nama_kegiatan'  => $record->kegiatan?->nama ?? '-',
+                    'lokasi_kegiatan'=> $record->kegiatan?->lokasLahan?->nama ?? '-',
+
+                    // Jumlah pohon (dari nama_donasi jika ada, atau estimasi dari jumlah)
+                    'jumlah_pohon'   => $record->jumlah_pohon ?? null,
+
+                    'tanggal'        => $record->created_at->translatedFormat('d F Y, H:i'),
+                    'status_label'   => RiwayatMapper::statusMapper($record->status, 'donasi'),
+                    'status_color'   => RiwayatMapper::statusColor(RiwayatMapper::statusMapper($record->status, 'donasi')),
+                    'kode'           => $record->kode_transaksi,
+                    'jumlah'         => 'Rp ' . number_format((float)($record->jumlah ?? 0), 0, ',', '.'),
+                    'metode'         => $record->metode_pembayaran ?? '-',
+                    'catatan'        => $record->catatan,
+                    'has_qr'         => false,
+                    'qr_url'         => null,
+                    'has_dokumentasi'=> $record->hasDokumentasi(),
+                    'dokumentasi_url'=> $record->hasDokumentasi()
                         ? route('riwayat.download', ['tipe' => 'donasi', 'id' => $record->id])
                         : null,
                     'has_sertifikat' => false,
@@ -164,19 +178,6 @@ class RiwayatController extends Controller
                 $record = Pembelian::where('id', $id)->where('user_id', $user->id)->first();
                 if (!$record)
                     abort(404, 'Data riwayat tidak ditemukan.');
-
-                $pohon_tertanam = 0;
-                $jenisPohons = \App\Models\JenisPohon::all();
-                $matchedJenisPohon = null;
-                foreach ($jenisPohons as $jp) {
-                    if (stripos($record->nama_item, $jp->nama) !== false) {
-                        $matchedJenisPohon = $jp;
-                        break;
-                    }
-                }
-                if ($matchedJenisPohon) {
-                    $pohon_tertanam = \App\Models\Realisasi::where('jenis_pohon_id', $matchedJenisPohon->id)->sum('jumlah');
-                }
 
                 $data = [
                     'id' => $record->id,
@@ -189,7 +190,6 @@ class RiwayatController extends Controller
                     'kode' => $record->kode_transaksi,
                     'jumlah' => 'Rp ' . number_format((float)($record->total_harga ?? 0), 0, ',', '.'),
                     'jumlah_item' => $record->jumlah_item,
-                    'pohon_tertanam' => $pohon_tertanam,
                     'catatan' => $record->catatan,
                     'has_qr' => $record->hasQrCode(),
                     'qr_url' => $record->hasQrCode()
@@ -226,7 +226,6 @@ class RiwayatController extends Controller
                     'kode' => 'KGT-' . str_pad($record->id, 6, '0', STR_PAD_LEFT),
                     'nama_lengkap' => $record->nama_lengkap,
                     'no_hp' => $record->no_hp,
-                    'pohon_tertanam' => $record->kegiatan ? ($record->kegiatan->realisasi_pohon ?? 0) : 0,
                     'catatan' => $record->catatan,
                     'has_qr' => $record->hasQrCode(),
                     'qr_url' => $record->hasQrCode()
