@@ -40,11 +40,15 @@ class KegiatanController extends Controller
      */
     public function show(string $slug)
     {
-        // Menggunakan with() dari Abyan_Branch dan firstOrFail()
-        // Pengecekan if (!$kegiatan) abort(404) dihapus karena firstOrFail() otomatis menanganinya
         $kegiatan = Kegiatan::with('dokumentasis')
             ->where('slug', $slug)
             ->firstOrFail();
+
+        if (!$kegiatan) {
+            abort(404);
+        }
+
+        // dd($kegiatan->dokumentasis);
 
         return view('kegiatan.show', compact('kegiatan'));
     }

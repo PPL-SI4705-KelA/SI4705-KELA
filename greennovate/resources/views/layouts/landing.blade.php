@@ -180,6 +180,16 @@
                             Donasi
                         </a>
 
+                        {{-- Langganan --}}
+                        <a href="{{ route('pembelian.index') }}"
+                        class="flex items-center gap-1.5 text-sm font-medium {{ request()->routeIs('pembelian.*') ? 'text-[#0D8B41] font-semibold' : 'text-gray-500 hover:text-[#0D8B41]' }} transition-colors px-2 py-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8c-3.866 0-7 3.134-7 7h14c0-3.866-3.134-7-7-7zm0-6a3 3 0 100 6 3 3 0 000-6z"/>
+                            </svg>
+                            Langganan
+                        </a>
+
                         {{-- Riwayat --}}
                         <a href="{{ route('riwayat.index') }}" id="nav-riwayat-link"
                            class="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-[#0D8B41] transition-colors px-2 py-1.5">

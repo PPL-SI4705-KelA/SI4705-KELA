@@ -137,31 +137,6 @@
                 @endif
             </div>
 
-            {{-- Galeri Dokumentasi --}}
-            @if($kegiatan->dokumentasis && $kegiatan->dokumentasis->count() > 0)
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-5 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 7a2 2 0 012-2h2l1-1h8l1 1h2a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
-                        <circle cx="12" cy="13" r="4" stroke-width="2"/>
-                    </svg>
-                    Dokumentasi Kegiatan
-                </h2>
-
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    @foreach($kegiatan->dokumentasis as $foto)
-                        <div class="overflow-hidden rounded-xl border border-gray-100 bg-gray-50">
-                            <img
-                                src="{{ Storage::url($foto->foto) }}"
-                                alt="Dokumentasi Kegiatan"
-                                class="w-full h-44 object-cover">
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-            @endif
-
             {{-- Syarat & Ketentuan --}}
             @if($kegiatan->terms)
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
@@ -304,7 +279,22 @@
 
             {{-- Tombol Daftar --}}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                @if($kegiatan->isRegistrationOpen())
+                @if(auth()->check() && (auth()->user()->isPetugas() || auth()->user()->isAdmin()))
+                    {{-- Petugas & Admin: tidak bisa mendaftar --}}
+                    <div class="flex items-start gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                        <svg class="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <div>
+                            <p class="text-sm font-semibold text-blue-700">
+                                {{ auth()->user()->isPetugas() ? 'Anda adalah Petugas Lapangan' : 'Anda adalah Administrator' }}
+                            </p>
+                            <p class="text-xs text-blue-500 mt-0.5 leading-relaxed">
+                                Pendaftaran kegiatan hanya untuk peserta umum.
+                            </p>
+                        </div>
+                    </div>
+                @elseif($kegiatan->isRegistrationOpen())
                     <a href="{{ route('kegiatan.daftar.form', $kegiatan->slug ?? $kegiatan->id) }}"
                        class="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -327,6 +317,7 @@
                     @endif
                 @endif
             </div>
+
 
             {{-- Kembali --}}
             <a href="{{ route('kegiatan.index') }}"

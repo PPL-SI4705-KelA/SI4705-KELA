@@ -290,9 +290,6 @@
 
     @stack('styles')
 </head>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <body class="text-gray-800 antialiased">
 
     <!-- Mobile Overlay -->
@@ -431,6 +428,18 @@
                 setTimeout(() => toast.remove(), 300);
             }, duration);
         }
+
+        // Auto-show toasts for session notifications
+        @if(session('success'))
+            window.addEventListener('DOMContentLoaded', () => {
+                showToast("{{ session('success') }}", 'success');
+            });
+        @endif
+        @if(session('error'))
+            window.addEventListener('DOMContentLoaded', () => {
+                showToast("{{ session('error') }}", 'error');
+            });
+        @endif
     </script>
 
     @stack('scripts')

@@ -79,6 +79,13 @@
                                 class="block px-4 py-2 text-sm hover:bg-gray-100">
                                 {{ __('Profile') }}
                             </a>
+                            <a href="{{ route('chat.index') }}"
+                                class="block px-4 py-2 text-sm hover:bg-gray-100 text-green-700 flex justify-between items-center">
+                                <span>{{ __('Hubungi Admin') }}</span>
+                                @if(isset($unreadChatCount) && $unreadChatCount > 0)
+                                    <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $unreadChatCount }}</span>
+                                @endif
+                            </a>
 
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
