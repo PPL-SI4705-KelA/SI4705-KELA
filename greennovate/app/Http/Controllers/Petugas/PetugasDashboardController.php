@@ -341,9 +341,9 @@ class PetugasDashboardController extends Controller
     }
 
     /**
-     * Menyimpan file dokumentasi untuk kegiatan (Khusus gambar).
+     * Unified Dokumentasi Upload: Menangani satu atau banyak foto.
      */
-    public function storeDokumentasi(Request $request, Kegiatan $kegiatan)
+    public function uploadDokumentasi(Request $request, Kegiatan $kegiatan)
     {
         $user = Auth::user();
 
@@ -355,31 +355,51 @@ class PetugasDashboardController extends Controller
         }
 
         $request->validate([
-            'foto' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+            'foto' => 'required',
+            'foto.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
         ], [
             'foto.required' => 'Pilih file foto dokumentasi.',
-            'foto.image'    => 'File harus berupa gambar.',
-            'foto.mimes'    => 'Format gambar harus jpeg, png, jpg, atau gif.',
-            'foto.max'      => 'Ukuran gambar maksimal 5MB.',
+            'foto.*.image'  => 'File harus berupa gambar.',
+            'foto.*.mimes'  => 'Format gambar harus jpeg, png, jpg, atau gif.',
+            'foto.*.max'    => 'Ukuran gambar maksimal 5MB.',
         ]);
 
-        if ($request->hasFile('foto')) {
-            $path = $request->file('foto')->store('dokumentasi', 'public');
+        try {
+            $files = $request->file('foto');
+            if (!is_array($files)) {
+                $files = [$files];
+            }
 
-            $dokumentasi = Dokumentasi::create([
-                'kegiatan_id' => $kegiatan->id,
-                'petugas_id'  => $user->id,
-                'file_path'   => $path,
-            ]);
+            $uploaded = [];
+            foreach ($files as $file) {
+                $path = $file->store('dokumentasi', 'public');
+                
+                // Prefer DokumentasiKegiatan if it exists (Target's preferred model)
+                if (class_exists('App\Models\DokumentasiKegiatan')) {
+                    $doc = DokumentasiKegiatan::create([
+                        'kegiatan_id' => $kegiatan->id,
+                        'petugas_id'  => $user->id,
+                        'foto'        => $path,
+                    ]);
+                } else {
+                    $doc = Dokumentasi::create([
+                        'kegiatan_id' => $kegiatan->id,
+                        'petugas_id'  => $user->id,
+                        'file_path'   => $path,
+                    ]);
+                }
+                $uploaded[] = $doc;
+            }
 
             return response()->json([
-                'message'      => 'Dokumentasi berhasil diunggah!',
-                'dokumentasi'  => $dokumentasi,
+                'message'     => 'Dokumentasi berhasil diunggah!',
+                'dokumentasi' => $uploaded,
             ], 200);
+        } catch (\Exception $e) {
+            Log::error('Gagal mengunggah dokumentasi', ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Gagal mengunggah dokumentasi.',
+            ], 500);
         }
-
-        return response()->json([
-            'message' => 'Gagal mengunggah dokumentasi.',
-        ], 400);
     }
 }

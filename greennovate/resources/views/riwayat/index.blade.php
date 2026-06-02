@@ -52,7 +52,7 @@
     <div class="flex flex-wrap gap-2 mb-6">
         <a href="{{ route('riwayat.index') }}" class="filter-btn {{ !$filterTipe ? 'active' : '' }}">Semua</a>
         <a href="{{ route('riwayat.index', ['tipe' => 'donasi']) }}" class="filter-btn {{ $filterTipe === 'donasi' ? 'active' : '' }}">💝 Donasi</a>
-        <a href="{{ route('riwayat.index', ['tipe' => 'pembelian']) }}" class="filter-btn {{ $filterTipe === 'pembelian' ? 'active' : '' }}">🛒 Pembelian</a>
+        <a href="{{ route('riwayat.index', ['tipe' => 'pembelian']) }}" class="filter-btn {{ $filterTipe === 'pembelian' ? 'active' : '' }}">🛒 Langganan</a>
         <a href="{{ route('riwayat.index', ['tipe' => 'kegiatan']) }}" class="filter-btn {{ $filterTipe === 'kegiatan' ? 'active' : '' }}">🌱 Kegiatan</a>
     </div>
 

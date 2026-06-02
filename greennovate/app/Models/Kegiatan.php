@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use App\Models\DokumentasiKegiatan;
 
 class Kegiatan extends Model
 {
@@ -82,13 +83,6 @@ class Kegiatan extends Model
     {
         return $this->hasMany(Donasi::class, 'kegiatan_id');
     }
-
-    public function dokumentasis()
-    {
-        return $this->hasMany(Dokumentasi::class, 'kegiatan_id');
-    }
-
-    // ── Scopes ──────────────────────────────────────────────────────────────
 
     public function scopeAssignedToPetugas($query, $petugasId)
     {
@@ -191,6 +185,12 @@ class Kegiatan extends Model
         }
 
         return null;
+    }
+
+    public function dokumentasis()
+    {
+        return $this->hasMany(
+            DokumentasiKegiatan::class, 'kegiatan_id');
     }
 
     public function getRemainingQuotaAttribute(): int
