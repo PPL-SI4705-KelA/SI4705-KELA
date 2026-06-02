@@ -84,6 +84,11 @@ class Kegiatan extends Model
         return $this->hasMany(Donasi::class, 'kegiatan_id');
     }
 
+    public function scopeAssignedToPetugas($query, $petugasId)
+    {
+        return $query->where('petugas_id', $petugasId);
+    }
+
     // ── Helper ──────────────────────────────────────────────────────────────
 
     public function hasPendaftar(): bool

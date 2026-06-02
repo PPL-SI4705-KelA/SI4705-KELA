@@ -120,13 +120,20 @@
                                 </div>
                             </td>
                             <td class="px-5 py-4 text-center">
-                                <a href="{{ route('petugas.dashboard') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-[12px] font-semibold text-[#1a8245] border border-green-200 rounded-lg hover:bg-green-50 transition-colors min-h-[36px]">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                    </svg>
-                                    Detail
-                                </a>
+                                <div class="flex items-center justify-center gap-2">
+                                    <a href="{{ route('kegiatan.show', $kegiatan->slug) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-[12px] font-semibold text-[#1a8245] border border-green-200 rounded-lg hover:bg-green-50 transition-colors min-h-[36px]">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                        </svg>
+                                        Detail
+                                    </a>
+                                    @if(in_array($kegiatan->status, ['Berlangsung', 'Persiapan']))
+                                        <a href="{{ route('petugas.realisasi', ['kegiatan_id' => $kegiatan->id]) }}" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-[12px] font-semibold text-white bg-[#1a8245] hover:bg-green-800 rounded-lg transition-colors min-h-[36px]">
+                                            Catat
+                                        </a>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty

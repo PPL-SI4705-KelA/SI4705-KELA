@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Petugas;
 use App\Http\Controllers\Controller;
 use App\Models\JenisPohon;
 use App\Models\Kegiatan;
+use App\Models\Pembelian;
 use App\Models\Realisasi;
+use App\Models\Dokumentasi;
 use App\Models\DokumentasiKegiatan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -114,7 +116,7 @@ class PetugasDashboardController extends Controller
     }
 
     /**
-     * PB-21 – AC-6: Simpan realisasi pencatatan pohon.
+     * PB-21 – AC-6: Simpan realisasi pencatatan pohon (via API / modal dashboard).
      */
     public function storeRealisasi(Request $request, Kegiatan $kegiatan)
     {
@@ -213,8 +215,8 @@ class PetugasDashboardController extends Controller
                     'lokasi'          => $k->lokasiLahan?->alamat ?? '-',
                     'tanggal'         => $k->tanggal?->format('d F Y'),
                     'status'          => $k->status,
-                    'target_pohon'    => $k->target_pohon,
                     'realisasi_pohon' => $k->realisasi_pohon,
+                    'target_pohon'    => $k->target_pohon,
                     'progress'        => $progress,
                 ];
             });
@@ -222,29 +224,182 @@ class PetugasDashboardController extends Controller
         return response()->json($kegiatanAktif);
     }
 
-    public function uploadDokumentasi(Request $request, Kegiatan $kegiatan)
+    /**
+     * PB-22: Menampilkan form input realisasi penanaman.
+     */
+    public function showRealisasiForm(Request $request)
     {
-        $request->validate([
-            'foto' => 'required|array|max:3',
-            'foto.*' => 'image|mimes:jpg,jpeg,png|max:5120'
+        $user = Auth::user();
+
+        // Ambil kegiatan aktif (Persiapan / Berlangsung) yang ditugaskan ke petugas ini
+        $kegiatans = Kegiatan::assignedToPetugas($user->id)
+            ->whereIn('status', ['Berlangsung', 'Persiapan'])
+            ->orderBy('nama')
+            ->get();
+
+        // Ambil jenis pohon aktif
+        $jenisPohons = JenisPohon::active()
+            ->orderBy('nama')
+            ->get();
+
+        $selectedKegiatanId = $request->input('kegiatan_id');
+
+        return view('petugas.realisasi', compact('kegiatans', 'jenisPohons', 'selectedKegiatanId'));
+    }
+
+    /**
+     * PB-22: Menyimpan data realisasi dari form.
+     */
+    public function storeRealisasiForm(Request $request)
+    {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'kegiatan_id'     => 'required|exists:kegiatan,id',
+            'jenis_pohon_id'  => 'required|exists:jenis_pohons,id',
+            'jumlah_tertanam' => 'required|integer|min:0',
+            'catatan'         => 'nullable|string|max:500',
+        ], [
+            'jumlah_tertanam.required' => 'Jumlah tertanam wajib diisi',
+            'jumlah_tertanam.min'      => 'Jumlah tidak boleh bernilai negatif',
+            'jumlah_tertanam.integer'  => 'Masukkan angka bilangan bulat yang valid',
         ]);
 
-        foreach($request->file('foto') as $file){
-
-            $path = $file->store(
-                'dokumentasi',
-                'public'
-            );
-
-            DokumentasiKegiatan::create([
-                'kegiatan_id' => $kegiatan->id,
-                'petugas_id' => Auth::id(),
-                'foto' => $path
-            ]);
+        // Pastikan kegiatan ditugaskan ke petugas ini
+        $kegiatan = Kegiatan::assignedToPetugas($user->id)->find($validated['kegiatan_id']);
+        if (!$kegiatan) {
+            abort(403, 'Forbidden');
         }
 
-        return response()->json([
-            'message' => 'Dokumentasi berhasil diupload'
+        // Pengecekan status transaksi terkait
+        $jenisPohon = JenisPohon::find($validated['jenis_pohon_id']);
+        $hasSuccessTx = Pembelian::where('status', 'Sukses')
+            ->where(function ($q) use ($jenisPohon) {
+                $q->where('nama_item', 'like', '%' . $jenisPohon->nama . '%')
+                  ->orWhere('nama_item', 'like', '%' . strtolower($jenisPohon->nama) . '%');
+            })
+            ->exists();
+
+        if (!$hasSuccessTx) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Realisasi tidak dapat diinput, transaksi belum diverifikasi',
+                    'errors'  => [
+                        'jumlah_tertanam' => ['Realisasi tidak dapat diinput, transaksi belum diverifikasi'],
+                    ],
+                ], 422);
+            }
+            return back()->withErrors(['jumlah_tertanam' => 'Realisasi tidak dapat diinput, transaksi belum diverifikasi'])->withInput();
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Simpan realisasi
+            $realisasi = Realisasi::create([
+                'kegiatan_id'    => $kegiatan->id,
+                'petugas_id'     => $user->id,
+                'jenis_pohon_id' => $validated['jenis_pohon_id'],
+                'jumlah'         => $validated['jumlah_tertanam'],
+                'catatan'        => $validated['catatan'] ?? null,
+                'recorded_at'    => Carbon::now(),
+            ]);
+
+            // Update realisasi_pohon di kegiatan
+            $kegiatan->increment('realisasi_pohon', $validated['jumlah_tertanam']);
+            $kegiatan->refresh();
+
+            DB::commit();
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message'    => 'Realisasi penanaman berhasil disimpan',
+                    'realisasi'  => $realisasi,
+                ], 200);
+            }
+
+            return redirect()->route('petugas.dashboard')->with('success', 'Realisasi penanaman berhasil disimpan');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('PB-22: Gagal menyimpan realisasi dari form', [
+                'error' => $e->getMessage(),
+            ]);
+
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'Terjadi kesalahan server.'], 500);
+            }
+            return back()->with('error', 'Terjadi kesalahan saat menyimpan data.')->withInput();
+        }
+    }
+
+    /**
+     * PB-22 Unit Test helper: Menentukan apakah jumlah_tertanam melebihi target kegiatan.
+     */
+    public function triggersWarning($jumlah_tertanam, $kegiatan)
+    {
+        return $jumlah_tertanam > $kegiatan->target_pohon;
+    }
+
+    /**
+     * Unified Dokumentasi Upload: Menangani satu atau banyak foto.
+     */
+    public function uploadDokumentasi(Request $request, Kegiatan $kegiatan)
+    {
+        $user = Auth::user();
+
+        // Validasi petugas memiliki akses ke kegiatan ini
+        if ($kegiatan->petugas_id !== $user->id) {
+            return response()->json([
+                'message' => 'Anda tidak memiliki akses ke kegiatan ini.',
+            ], 403);
+        }
+
+        $request->validate([
+            'foto' => 'required',
+            'foto.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
+        ], [
+            'foto.required' => 'Pilih file foto dokumentasi.',
+            'foto.*.image'  => 'File harus berupa gambar.',
+            'foto.*.mimes'  => 'Format gambar harus jpeg, png, jpg, atau gif.',
+            'foto.*.max'    => 'Ukuran gambar maksimal 5MB.',
         ]);
+
+        try {
+            $files = $request->file('foto');
+            if (!is_array($files)) {
+                $files = [$files];
+            }
+
+            $uploaded = [];
+            foreach ($files as $file) {
+                $path = $file->store('dokumentasi', 'public');
+                
+                // Prefer DokumentasiKegiatan if it exists (Target's preferred model)
+                if (class_exists('App\Models\DokumentasiKegiatan')) {
+                    $doc = DokumentasiKegiatan::create([
+                        'kegiatan_id' => $kegiatan->id,
+                        'petugas_id'  => $user->id,
+                        'foto'        => $path,
+                    ]);
+                } else {
+                    $doc = Dokumentasi::create([
+                        'kegiatan_id' => $kegiatan->id,
+                        'petugas_id'  => $user->id,
+                        'file_path'   => $path,
+                    ]);
+                }
+                $uploaded[] = $doc;
+            }
+
+            return response()->json([
+                'message'     => 'Dokumentasi berhasil diunggah!',
+                'dokumentasi' => $uploaded,
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Gagal mengunggah dokumentasi', ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Gagal mengunggah dokumentasi.',
+            ], 500);
+        }
     }
 }

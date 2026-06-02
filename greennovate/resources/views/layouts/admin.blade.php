@@ -70,7 +70,7 @@
 
             {{-- Kegiatan --}}
             <a href="{{ route('admin.kegiatan.index') }}"
-               class="sidebar-link {{ request()->routeIs('admin.kegiatan.*') ? 'active' : '' }}">
+               class="sidebar-link {{ request()->routeIs('admin.kegiatan.*') && !request()->routeIs('admin.kegiatan.peserta') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
@@ -88,24 +88,54 @@
                 Jenis Pohon
             </a>
 
-            {{-- Sumbangan --}}
-            <a href="#"
-               class="sidebar-link {{ request()->routeIs('admin.sumbangan.*') ? 'active' : '' }}">
+            {{-- Peserta Kegiatan --}}
+            <a href="{{ route('admin.peserta.index') }}"
+               class="sidebar-link {{ request()->routeIs('admin.peserta.index') || request()->routeIs('admin.kegiatan.peserta') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
-                Sumbangan
+                Peserta Kegiatan
             </a>
 
-            {{-- Pengguna --}}
-            <a href="#"
+            {{-- Daftar Donasi --}}
+            <a href="{{ route('admin.donasi.index') }}"
+               class="sidebar-link {{ request()->routeIs('admin.donasi.*') ? 'active' : '' }}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Daftar Donasi
+            </a>
+
+            {{-- Daftar Pembelian --}}
+            <a href="{{ route('admin.pembelian.index') }}"
+               class="sidebar-link {{ request()->routeIs('admin.pembelian.*') ? 'active' : '' }}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                </svg>
+                Daftar Pembelian
+            </a>
+
+            {{-- Daftar Pengguna --}}
+            <a href="{{ route('admin.pengguna.index') }}"
                class="sidebar-link {{ request()->routeIs('admin.pengguna.*') ? 'active' : '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
-                Pengguna
+                Daftar Pengguna
+            </a>
+
+            {{-- Pesan Masuk (Chat) --}}
+            <a href="{{ route('admin.chat.index') }}"
+               class="sidebar-link {{ request()->routeIs('admin.chat.*') ? 'active' : '' }}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                </svg>
+                Pesan Masuk
             </a>
 
         </nav>
@@ -175,5 +205,6 @@
         </main>
     </div>
 
+    @stack('scripts')
 </body>
 </html>
