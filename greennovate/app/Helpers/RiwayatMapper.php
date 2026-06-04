@@ -90,7 +90,7 @@ class RiwayatMapper
     {
         return match ($tipe) {
             'donasi'    => 'Donasi',
-            'pembelian' => 'Langganan',
+            'pembelian' => 'Pembelian',
             'kegiatan'  => 'Kegiatan',
             default     => ucfirst($tipe),
         };

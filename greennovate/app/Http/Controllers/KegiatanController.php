@@ -40,15 +40,10 @@ class KegiatanController extends Controller
      */
     public function show(string $slug)
     {
+        // Menggunakan with() untuk eager load dokumentasi dan firstOrFail() untuk auto 404
         $kegiatan = Kegiatan::with('dokumentasis')
             ->where('slug', $slug)
             ->firstOrFail();
-
-        if (!$kegiatan) {
-            abort(404);
-        }
-
-        // dd($kegiatan->dokumentasis);
 
         return view('kegiatan.show', compact('kegiatan'));
     }
