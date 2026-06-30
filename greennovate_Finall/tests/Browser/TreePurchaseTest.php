@@ -68,7 +68,8 @@ class TreePurchaseTest extends DuskTestCase
                     ->select('jenis_pohon_id', (string) $this->jenisPohon->id)
                     ->pause(1000) 
                     ->assertSee('Total Pembayaran')
-                    ->assertSee(number_format($this->jenisPohon->harga + 25000, 0, ',', '.')); 
+                    ->assertSee(number_format($this->jenisPohon->harga + 25000, 0, ',', '.'))
+                    ->pause(15000);
         });
     }
 
@@ -95,9 +96,7 @@ class TreePurchaseTest extends DuskTestCase
                     ->pause(2000)
                     // Halaman invoice
                     ->assertPathBeginsWith('/pembelian/invoice/')
-                    // Simulasi klik bayar jika ada tombol Bayar Sekarang, jika tidak bisa diabaikan atau disesuaikan dengan view invoice.
-                    // ->press('Bayar Sekarang') 
-                    ->pause(1000);
+                    ->pause(15000);
         });
     }
 
@@ -126,7 +125,8 @@ class TreePurchaseTest extends DuskTestCase
 
             $browser->loginAs($this->user)
                     ->visit('/pembelian/invoice/' . $pembelian->id)
-                    ->pause(1000);
+                    ->pause(1000)
+                    ->pause(15000);
             
             // Asumsikan UI menunjukkan expired atau tidak
             // ->assertSee('Expired'); 
@@ -153,14 +153,8 @@ class TreePurchaseTest extends DuskTestCase
             ]);
 
             // Asumsi UI untuk upload belum diketahui, kita hanya skip atau buat dummy
-            $browser->loginAs($this->fieldOfficer);
-            
-            // Opsional: kunjungi admin dashboard / url upload jika sudah ada rutenya.
-            // ->visit('/admin/pembelian') 
-            // ->attach('foto_bukti', __DIR__.'/test_images/dummy_photo.jpg') 
-            // ->press('Upload')
-            // ->pause(1500)
-            // ->assertSee('Bukti berhasil diunggah');
+            $browser->loginAs($this->fieldOfficer)
+                    ->pause(15000);
         });
     }
 
@@ -185,9 +179,8 @@ class TreePurchaseTest extends DuskTestCase
             
             // Realisasi dan QrCode table mungkin belum ada atau belum lengkap seeder nya
             // Cukup login atau pastikan data ter-assign
-            // Jika ada detail route:
-            // $browser->visit('/qr/detail/' . $qrCode->kode)
-            //         ->pause(1000);
+            $browser->loginAs($this->user)
+                    ->pause(15000);
         });
     }
 }

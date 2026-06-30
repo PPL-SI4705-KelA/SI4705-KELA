@@ -28,6 +28,16 @@ Route::get('/', [LandingController::class, 'index'])->name('home');
 Route::get('/kegiatan', [KegiatanController::class, 'index'])->name('kegiatan.index');
 Route::get('/kegiatan/{slug}', [KegiatanController::class, 'show'])->name('kegiatan.show');
 
+// ─── Serve dokumentasi foto (public, no auth required) ────────────────────────
+Route::get('/dokumentasi/{id}/foto', function ($id) {
+    $dok = \App\Models\DokumentasiKegiatan::findOrFail($id);
+    $path = storage_path('app/public/' . $dok->foto);
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    return response()->file($path);
+})->name('dokumentasi.foto');
+
 // ─── Guest routes (Hanya untuk yang belum login) ──────────────────────────────
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'showForm'])->name('register');
@@ -76,6 +86,7 @@ Route::middleware(['auth', 'check.active'])->group(function () {
     Route::get('/donations/confirmation', [DonationController::class, 'confirmation'])->name('donations.confirmation');
     Route::post('/donations/submit', [DonationController::class, 'lanjutPembayaran'])->name('donations.submit');
     Route::get('/donasi/{id}/sertifikat', [\App\Http\Controllers\User\SertifikatController::class, 'generateSertifikat'])->name('donasi.sertifikat');
+    Route::get('/pembelian/{id}/sertifikat', [\App\Http\Controllers\User\SertifikatController::class, 'generateSertifikatPembelian'])->name('pembelian.sertifikat');
     Route::get('/donations/payment/{donasi}', [DonationController::class, 'payment'])->name('donations.payment');
     Route::post('/donations/upload-proof/{donasi}', [DonationController::class, 'uploadBuktiPembayaran'])->name('donations.upload-proof');
 
@@ -117,6 +128,16 @@ Route::middleware(['auth', 'check.active'])->group(function () {
 
             // ── Chat (Admin) ──────────────────────────────────────────────────
             Route::get('/chat', [AdminChatController::class, 'index'])->name('chat.index');
+            // Debug route to test model binding issue
+            Route::get('/chat-debug/{id}', function ($id) {
+                $conv = \App\Models\Conversation::find($id);
+                return response()->json([
+                    'found' => $conv ? true : false,
+                    'id' => $id,
+                    'conv' => $conv,
+                    'all_ids' => \App\Models\Conversation::pluck('id'),
+                ]);
+            })->name('chat.debug');
             Route::get('/chat/{conversation}', [AdminChatController::class, 'show'])->name('chat.show');
             Route::post('/chat/{conversation}/reply', [AdminChatController::class, 'reply'])->name('chat.reply');
             Route::get('/chat/{conversation}/messages', [AdminChatController::class, 'getMessages'])->name('chat.messages');

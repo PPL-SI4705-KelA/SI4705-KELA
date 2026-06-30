@@ -27,6 +27,7 @@ class AdminChatController extends Controller
 
     public function show(Conversation $conversation)
     {
+        \Log::info('AdminChatController@show reached', ['conversation_id' => $conversation->id]);
         $conversation->load('user');
 
         // Mark all user messages in this conversation as read
@@ -40,38 +41,25 @@ class AdminChatController extends Controller
                 'read_at' => now(),
             ]);
 
-        return view('admin.chat.show', compact('conversation'));
+        // Pre-load messages so the conversation renders immediately on page load
+        // instead of waiting for the first AJAX poll to finish.
+        $messages = $conversation->messages()->with('sender')->orderBy('created_at', 'asc')->get();
+
+        return view('admin.chat.show', compact('conversation', 'messages'));
     }
 
     public function reply(Request $request, Conversation $conversation)
     {
         $request->validate([
-            'body' => 'nullable|string|max:1000',
-            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'body' => 'required|string|max:1000',
         ], [
+            'body.required' => 'Pesan tidak boleh kosong',
             'body.max' => 'Pesan maksimal 1000 karakter',
-            'attachment.mimes' => 'Format file yang diizinkan hanya JPG, PNG, atau PDF',
-            'attachment.max' => 'Ukuran file maksimal 2MB',
         ]);
-
-        if (!$request->body && !$request->hasFile('attachment')) {
-            return response()->json(['errors' => ['body' => ['Pesan atau lampiran tidak boleh kosong']]], 422);
-        }
-
-        $attachmentPath = null;
-        $attachmentType = null;
-
-        if ($request->hasFile('attachment')) {
-            $file = $request->file('attachment');
-            $attachmentPath = $file->store('chat_attachments', 'public');
-            $attachmentType = $file->getClientOriginalExtension() === 'pdf' ? 'document' : 'image';
-        }
 
         $message = $conversation->messages()->create([
             'sender_id' => Auth::id(),
             'body' => $request->body,
-            'attachment_path' => $attachmentPath,
-            'attachment_type' => $attachmentType,
         ]);
 
         $conversation->update(['last_message_at' => now()]);

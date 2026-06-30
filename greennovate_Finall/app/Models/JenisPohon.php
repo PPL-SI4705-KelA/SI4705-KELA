@@ -17,7 +17,6 @@ class JenisPohon extends Model
         'nama_latin',
         'kategori_pohon_id',
         'harga',
-        'status',
         'created_by',
         'version',
     ];
@@ -42,57 +41,10 @@ class JenisPohon extends Model
     // ── Scopes ──────────────────────────────────────────────────────────────
 
     /**
-     * Scope: hanya jenis pohon aktif.
-     */
-    public function scopeActive($query)
-    {
-        return $query->where('status', 'active');
-    }
-
-    /**
-     * Scope: hanya jenis pohon tidak aktif (termasuk soft-deleted).
-     */
-    public function scopeInactive($query)
-    {
-        return $query->where('status', 'inactive');
-    }
-
-    // ── Helpers ──────────────────────────────────────────────────────────────
-
-    public function isActive(): bool
-    {
-        return $this->status === 'active';
-    }
-
-    /**
      * Format harga ke Rupiah: "Rp 50.000"
      */
     public function getHargaFormattedAttribute(): string
     {
         return 'Rp ' . number_format((float)($this->harga ?? 0), 0, ',', '.');
-    }
-
-    /**
-     * Label status yang user-friendly.
-     */
-    public function getStatusLabelAttribute(): string
-    {
-        return match ($this->status) {
-            'active'   => 'Aktif',
-            'inactive' => 'Tidak Aktif',
-            default    => $this->status ?? '-',
-        };
-    }
-
-    /**
-     * Warna badge status.
-     */
-    public function getStatusColorAttribute(): string
-    {
-        return match ($this->status) {
-            'active'   => 'green',
-            'inactive' => 'red',
-            default    => 'gray',
-        };
     }
 }

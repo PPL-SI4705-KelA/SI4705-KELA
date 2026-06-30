@@ -47,22 +47,13 @@
                     @endforeach
                 </select>
             </div>
-            <div class="min-w-[140px]">
-                <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
-                <select name="status"
-                        id="select-filter-status"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option value="active" {{ request('status', 'active') === 'active' ? 'selected' : '' }}>Aktif</option>
-                    <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Tidak Aktif</option>
-                    <option value="all" {{ request('status') === 'all' ? 'selected' : '' }}>Semua</option>
-                </select>
             </div>
             <button type="submit"
                     id="btn-filter"
                     class="px-4 py-2 bg-gray-800 text-white text-sm rounded-lg hover:bg-gray-900 transition">
                 Filter
             </button>
-            @if(request()->hasAny(['search', 'kategori', 'status']))
+            @if(request()->hasAny(['search', 'kategori']))
                 <a href="{{ route('admin.jenis-pohon.index') }}"
                    id="btn-reset-filter"
                    class="px-4 py-2 text-sm text-gray-500 hover:text-gray-800 underline">
@@ -83,7 +74,6 @@
                         <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Nama Latin</th>
                         <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Kategori</th>
                         <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Harga</th>
-                        <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
                         <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Aksi</th>
                     </tr>
                 </thead>
@@ -99,16 +89,7 @@
                             </span>
                         </td>
                         <td class="px-4 py-3 text-gray-800 font-semibold">{{ $pohon->harga_formatted }}</td>
-                        <td class="px-4 py-3">
-                            @php
-                                $badge = $pohon->status === 'active'
-                                    ? 'bg-green-100 text-green-700'
-                                    : 'bg-red-100 text-red-600';
-                            @endphp
-                            <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold {{ $badge }}">
-                                {{ $pohon->status_label }}
-                            </span>
-                        </td>
+
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-2">
                                 <a href="{{ route('admin.jenis-pohon.edit', $pohon) }}"
@@ -117,7 +98,7 @@
                                 <form method="POST"
                                       action="{{ route('admin.jenis-pohon.destroy', $pohon) }}"
                                       id="form-delete-{{ $pohon->id }}"
-                                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus jenis pohon \'{{ $pohon->nama }}\'? Data akan dinonaktifkan (soft delete).')">
+                                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus jenis pohon \'{{ $pohon->nama }}\'?')">
                                     @csrf @method('DELETE')
                                     <button type="submit"
                                             id="btn-delete-{{ $pohon->id }}"
@@ -128,7 +109,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="px-4 py-10 text-center text-gray-400 text-sm">
+                        <td colspan="6" class="px-4 py-10 text-center text-gray-400 text-sm">
                             Belum ada data jenis pohon.
                             <a href="{{ route('admin.jenis-pohon.create') }}" class="text-green-600 hover:underline ml-1">Tambah sekarang</a>
                         </td>

@@ -22,25 +22,12 @@ class JenisPohonController extends Controller
 
         // Search berdasarkan nama pohon
         if ($request->filled('search')) {
-            $query->where('nama', 'like', '%' . $request->search . '%');
+            $query->where([['nama', 'like', '%' . $request->search . '%']]);
         }
 
         // Filter berdasarkan kategori
         if ($request->filled('kategori')) {
-            $query->where('kategori_pohon_id', $request->kategori);
-        }
-
-        // Filter berdasarkan status (default: hanya aktif)
-        if ($request->filled('status')) {
-            if ($request->status === 'all') {
-                // Tampilkan semua termasuk inactive
-            } elseif ($request->status === 'inactive') {
-                $query->where('status', 'inactive');
-            } else {
-                $query->where('status', 'active');
-            }
-        } else {
-            $query->where('status', 'active');
+            $query->where([['kategori_pohon_id', '=', $request->kategori]]);
         }
 
         // Tampilkan yang soft-deleted jika diminta
@@ -49,7 +36,7 @@ class JenisPohonController extends Controller
         }
 
         $jenisPohons = $query->latest()->paginate(20)->withQueryString();
-        $kategoris   = KategoriPohon::orderBy('nama')->get();
+        $kategoris   = KategoriPohon::query()->orderByRaw('nama ASC')->get();
 
         return view('admin.jenis-pohon.index', compact('jenisPohons', 'kategoris'));
     }
@@ -61,7 +48,7 @@ class JenisPohonController extends Controller
      */
     public function create()
     {
-        $kategoris = KategoriPohon::orderBy('nama')->get();
+        $kategoris = KategoriPohon::query()->orderByRaw('nama ASC')->get();
 
         return view('admin.jenis-pohon.create', compact('kategoris'));
     }
@@ -78,7 +65,6 @@ class JenisPohonController extends Controller
             'nama_latin'        => ['nullable', 'string', 'max:100'],
             'kategori_pohon_id' => ['required', 'integer', 'exists:kategori_pohons,id'],
             'harga'             => ['required', 'numeric', 'min:1000', 'max:10000000'],
-            'status'            => ['required', 'in:active,inactive'],
         ], [
             'nama.required'              => 'Nama pohon wajib diisi.',
             'nama.min'                   => 'Nama pohon minimal 3 karakter.',
@@ -90,7 +76,6 @@ class JenisPohonController extends Controller
             'harga.numeric'              => 'Harga harus berupa angka.',
             'harga.min'                  => 'Harga minimal Rp 1.000.',
             'harga.max'                  => 'Harga maksimal Rp 10.000.000.',
-            'status.required'            => 'Status wajib dipilih.',
         ]);
 
         $validated['created_by'] = Auth::id();
@@ -110,7 +95,7 @@ class JenisPohonController extends Controller
      */
     public function edit(JenisPohon $jenisPohon)
     {
-        $kategoris = KategoriPohon::orderBy('nama')->get();
+        $kategoris = KategoriPohon::query()->orderByRaw('nama ASC')->get();
 
         return view('admin.jenis-pohon.edit', compact('jenisPohon', 'kategoris'));
     }
@@ -128,7 +113,6 @@ class JenisPohonController extends Controller
             'nama_latin'        => ['nullable', 'string', 'max:100'],
             'kategori_pohon_id' => ['required', 'integer', 'exists:kategori_pohons,id'],
             'harga'             => ['required', 'numeric', 'min:1000', 'max:10000000'],
-            'status'            => ['required', 'in:active,inactive'],
             'version'           => ['required', 'integer'],
         ], [
             'nama.required'              => 'Nama pohon wajib diisi.',
@@ -141,7 +125,6 @@ class JenisPohonController extends Controller
             'harga.numeric'              => 'Harga harus berupa angka.',
             'harga.min'                  => 'Harga minimal Rp 1.000.',
             'harga.max'                  => 'Harga maksimal Rp 10.000.000.',
-            'status.required'            => 'Status wajib dipilih.',
         ]);
 
         // Optimistic locking: cek version
@@ -170,8 +153,7 @@ class JenisPohonController extends Controller
      */
     public function destroy(JenisPohon $jenisPohon)
     {
-        // Soft delete: set status = inactive, lalu soft-delete record
-        $jenisPohon->update(['status' => 'inactive']);
+        // Soft delete record
         $jenisPohon->delete();
 
         return redirect()

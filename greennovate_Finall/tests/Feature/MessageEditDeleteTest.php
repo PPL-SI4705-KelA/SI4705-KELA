@@ -157,4 +157,85 @@ class MessageEditDeleteTest extends TestCase
             'deleted_at' => null,
         ]);
     }
+
+    public function test_edited_at_only_updated_on_first_edit()
+    {
+        $user = User::factory()->create(['role' => 'user', 'is_active' => true]);
+        $conversation = Conversation::create(['user_id' => $user->id, 'status' => 'open']);
+        $message = Message::create([
+            'conversation_id' => $conversation->id,
+            'sender_id' => $user->id,
+            'body' => 'Pesan asli',
+        ]);
+
+        // First edit
+        $this->actingAs($user)->patchJson(route('message.update', $message->id), [
+            'body' => 'Pesan diedit pertama',
+        ]);
+
+        $message->refresh();
+        $this->assertTrue($message->is_edited);
+        $firstEditTime = $message->edited_at;
+        $this->assertNotNull($firstEditTime);
+
+        // Sleep 1 second to ensure different timestamp
+        sleep(1);
+
+        // Second edit
+        $this->actingAs($user)->patchJson(route('message.update', $message->id), [
+            'body' => 'Pesan diedit kedua',
+        ]);
+
+        $message->refresh();
+        $this->assertEquals('Pesan diedit kedua', $message->body);
+        $this->assertEquals($firstEditTime->timestamp, $message->edited_at->timestamp);
+    }
+
+    public function test_attachment_path_not_changed_on_edit()
+    {
+        $user = User::factory()->create(['role' => 'user', 'is_active' => true]);
+        $conversation = Conversation::create(['user_id' => $user->id, 'status' => 'open']);
+        $path = 'chat_attachments/dummy.jpg';
+
+        $message = Message::create([
+            'conversation_id' => $conversation->id,
+            'sender_id' => $user->id,
+            'body' => 'Pesan asli dengan lampiran',
+            'attachment_path' => $path,
+            'attachment_type' => 'image',
+        ]);
+
+        $this->actingAs($user)->patchJson(route('message.update', $message->id), [
+            'body' => 'Pesan diedit',
+        ]);
+
+        $message->refresh();
+        $this->assertEquals('Pesan diedit', $message->body);
+        $this->assertEquals($path, $message->attachment_path);
+        $this->assertEquals('image', $message->attachment_type);
+    }
+
+    public function test_get_messages_returns_is_edited_and_body()
+    {
+        $user = User::factory()->create(['role' => 'user', 'is_active' => true]);
+        $conversation = Conversation::create(['user_id' => $user->id, 'status' => 'open']);
+        $message = Message::create([
+            'conversation_id' => $conversation->id,
+            'sender_id' => $user->id,
+            'body' => 'Pesan asli',
+        ]);
+
+        $this->actingAs($user)->patchJson(route('message.update', $message->id), [
+            'body' => 'Pesan telah diedit untuk polling',
+        ]);
+
+        $response = $this->actingAs($user)->getJson(route('chat.messages'));
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            'id' => $message->id,
+            'body' => 'Pesan telah diedit untuk polling',
+            'is_edited' => true,
+        ]);
+    }
 }

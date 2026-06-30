@@ -69,6 +69,7 @@
                             <th class="px-6 py-4 w-10">Pilih</th>
                             <th class="px-6 py-4">ID Donasi</th>
                             <th class="px-6 py-4">Nama Pengguna</th>
+                            <th class="px-6 py-4">Catatan</th>
                             <th class="px-6 py-4">Nominal</th>
                             <th class="px-6 py-4">Tanggal Donasi</th>
                             <th class="px-6 py-4">Bukti</th>
@@ -88,6 +89,9 @@
                             <td class="px-6 py-4">
                                 <div class="font-medium text-gray-900">{{ $d->user ? $d->user->name : 'N/A' }}</div>
                                 <div class="text-xs text-gray-400">{{ $d->user ? $d->user->email : 'N/A' }}</div>
+                            </td>
+                            <td class="px-6 py-4 max-w-[200px]">
+                                <div class="text-sm text-gray-700 whitespace-normal break-words">{{ $d->catatan ?: '-' }}</div>
                             </td>
                             <td class="px-6 py-4 text-gray-900 font-bold">
                                 Rp {{ number_format($d->jumlah, 0, ',', '.') }}

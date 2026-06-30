@@ -152,6 +152,50 @@
                 </div>
             @endif
 
+            {{-- Galeri Dokumentasi Lapangan --}}
+            @if($kegiatan->dokumentasis && $kegiatan->dokumentasis->count() > 0)
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Dokumentasi Lapangan
+                        <span class="ml-auto text-xs font-normal text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">
+                            {{ $kegiatan->dokumentasis->count() }} foto
+                        </span>
+                    </h2>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        @foreach($kegiatan->dokumentasis as $dok)
+                            <a href="{{ route('dokumentasi.foto', $dok->id) }}"
+                               target="_blank"
+                               class="group relative aspect-square rounded-xl overflow-hidden bg-gray-100 border border-gray-200 hover:border-green-400 transition-all duration-200 hover:shadow-md">
+                                <img src="{{ route('dokumentasi.foto', $dok->id) }}"
+                                     alt="Foto dokumentasi kegiatan"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                {{-- Overlay on hover --}}
+                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200 flex items-center justify-center">
+                                    <svg class="w-7 h-7 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                                    </svg>
+                                </div>
+                                {{-- Upload date badge --}}
+                                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent px-2 py-1.5">
+                                    <p class="text-[10px] text-white/80">{{ $dok->created_at->translatedFormat('d M Y') }}</p>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+
+                    <p class="mt-3 text-xs text-gray-400 flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Diunggah oleh Petugas Lapangan. Klik foto untuk melihat ukuran penuh.
+                    </p>
+                </div>
+            @endif
+
         </div>
 
         {{-- ===== KOLOM KANAN / SIDEBAR ===== --}}

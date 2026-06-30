@@ -28,10 +28,10 @@ class SertifikatController extends Controller
                 return redirect()->back()->with('error', 'Sertifikat tersedia setelah donasi berhasil diverifikasi');
             }
 
-            // Validasi dokumentasi
-            if (!$donasi->hasDokumentasi()) {
-                return redirect()->back()->with('error', 'Sertifikat akan tersedia setelah petugas mengupload dokumentasi penanaman');
-            }
+            // Validasi dokumentasi (Dihapus agar langsung bisa unduh setelah Sukses)
+            // if (!$donasi->hasDokumentasi()) {
+            //     return redirect()->back()->with('error', 'Sertifikat akan tersedia setelah petugas mengupload dokumentasi penanaman');
+            // }
 
             // Generate nomor sertifikat unik: CERT-{tahun}-{id}
             $tahun = $donasi->created_at->format('Y');
@@ -77,6 +77,66 @@ class SertifikatController extends Controller
             throw $e;
         } catch (\Exception $e) {
             Log::error('Gagal generate sertifikat: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal membuat sertifikat. Silakan coba lagi.');
+        }
+    }
+    public function generateSertifikatPembelian($id)
+    {
+        try {
+            $pembelian = \App\Models\Pembelian::with('user.o2Stat')->findOrFail($id);
+
+            // Validasi kepemilikan
+            if (auth()->id() !== $pembelian->user_id) {
+                return abort(403, 'Anda tidak memiliki akses ke data ini');
+            }
+
+            // Validasi status
+            if ($pembelian->status !== 'Sukses') {
+                return redirect()->back()->with('error', 'Sertifikat tersedia setelah pembelian berhasil diverifikasi');
+            }
+
+            // Validasi dokumentasi (Dihapus agar langsung bisa unduh setelah Sukses)
+            // if (!$pembelian->hasDokumentasi()) {
+            //     return redirect()->back()->with('error', 'Sertifikat akan tersedia setelah petugas mengupload dokumentasi penanaman');
+            // }
+
+            $tahun = $pembelian->created_at->format('Y');
+            $nomorSertifikat = "CERT-PEMB-{$tahun}-{$pembelian->id}";
+
+            $jumlahPohonTrx = $pembelian->jumlah_item;
+            
+            $totalO2 = $pembelian->user->o2Stat ? $pembelian->user->o2Stat->total_o2_kg_per_bulan : 0;
+            $o2Trx = $jumlahPohonTrx * 8.3;
+
+            $lokasi = 'Lokasi Penghijauan';
+            $nama_kegiatan = $pembelian->nama_item;
+            if (strpos($pembelian->nama_item, '- Lahan: ') !== false) {
+                $parts = explode('- Lahan: ', $pembelian->nama_item);
+                $lokasi = trim(end($parts));
+                $nama_kegiatan = trim($parts[0]);
+            }
+
+            $data = [
+                'nomor_sertifikat'  => $nomorSertifikat,
+                'nama_penyumbang'   => $pembelian->user->name,
+                'nama_kegiatan'     => $nama_kegiatan,
+                'lokasi'            => $lokasi,
+                'tanggal_penanaman' => $pembelian->created_at->format('Y-m-d'),
+                'jumlah_pohon'      => $jumlahPohonTrx,
+                'o2_trx'            => $o2Trx,
+                'total_o2_user'     => $totalO2,
+                'tanggal_terbit'    => now()->format('d F Y'),
+            ];
+
+            $pdf = Pdf::loadView('sertifikat.pdf', $data)
+                      ->setPaper('a4', 'landscape');
+
+            return $pdf->download("{$nomorSertifikat}.pdf");
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return abort(404, 'Pembelian tidak ditemukan');
+        } catch (\Exception $e) {
+            Log::error('Gagal generate sertifikat pembelian: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal membuat sertifikat. Silakan coba lagi.');
         }
     }

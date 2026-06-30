@@ -30,7 +30,7 @@ class MessageController extends Controller
         $message->update([
             'body' => $request->body,
             'is_edited' => \Illuminate\Support\Facades\DB::raw('true'),
-            'edited_at' => now(),
+            'edited_at' => $message->is_edited ? $message->edited_at : now(),
         ]);
 
         return response()->json(['success' => true, 'data' => $message]);

@@ -1,0 +1,183 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!--[if gte mso 9]><xml>
+<x:ExcelWorkbook>
+<x:ExcelWorksheets>
+<x:ExcelWorksheet>
+<x:Name>Test Case Chat</x:Name>
+<x:WorksheetOptions>
+<x:DisplayGridlines/>
+</x:WorksheetOptions>
+</x:ExcelWorksheet>
+</x:ExcelWorksheets>
+</x:ExcelWorkbook>
+</xml><![endif]-->
+<style>
+td, th {
+  mso-number-format:\@;
+  vertical-align: top;
+  border: 1px solid #000;
+  padding: 6px;
+  font-family: Calibri, Arial, sans-serif;
+  font-size: 11pt;
+}
+th {
+  background-color: #4472C4;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+}
+.passed {
+  background-color: #C6EFCE;
+  color: #006100;
+  font-weight: bold;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+<table border="1" cellspacing="0" cellpadding="4">
+<tr>
+<th>ID</th>
+<th>Modul/Fitur</th>
+<th>Test Case Scenario</th>
+<th>Precondition</th>
+<th>Steps</th>
+<th>Input</th>
+<th>Expected Result</th>
+<th>Output</th>
+<th>Status</th>
+<th>Tanggal Uji</th>
+<th>Catatan</th>
+</tr>
+
+<tr>
+<td>TC-PB25-001</td>
+<td>User - Chat Hubungi Admin</td>
+<td>Membuka Halaman Chat sebagai User (Positive)</td>
+<td>User sudah login dengan kredensial valid, memiliki role user, session aktif, middleware auth dan check.active tersedia</td>
+<td>1. Login sebagai user dengan email user@greennovate.test<br>2. Kunjungi halaman /chat<br>3. Tunggu hingga teks "Hubungi Admin" muncul di halaman (maks 10 detik)</td>
+<td>Login menggunakan kredensial:<br>• Email: user@greennovate.test<br>• Password: user12345<br>• Role: user<br><br>Browser diarahkan ke URL /chat.<br><br>Tidak ada data form yang diinputkan — pengujian hanya memverifikasi tampilan elemen UI halaman chat (judul "Hubungi Admin", kolom input #chat-input, dan tombol #chat-submit).</td>
+<td>Halaman chat tampil dengan judul "Hubungi Admin", kolom input #chat-input tersedia, dan tombol #chat-submit tersedia di bagian bawah halaman</td>
+<td>Sistem berhasil menampilkan halaman chat dengan semua elemen UI (judul, input, tombol kirim) tampil dengan benar</td>
+<td class="passed">Passed</td>
+<td>10/06/2026</td>
+<td></td>
+</tr>
+
+<tr>
+<td>TC-PB25-002</td>
+<td>User - Chat Hubungi Admin</td>
+<td>Kirim Pesan Kosong (Negative)</td>
+<td>User sudah login dan berada di halaman /chat. Kolom input pesan #chat-input dalam keadaan kosong. Atribut HTML required pada input di-bypass menggunakan JavaScript agar form dapat di-submit dalam keadaan kosong.</td>
+<td>1. Login sebagai user dan buka /chat<br>2. Tunggu halaman selesai dimuat (teks "Hubungi Admin" muncul)<br>3. Hapus atribut required dari elemen #chat-input menggunakan perintah JavaScript: document.getElementById('chat-input').removeAttribute('required')<br>4. Kosongkan kolom input #chat-input<br>5. Klik tombol #chat-submit</td>
+<td>Login menggunakan kredensial:<br>• Email: user@greennovate.test<br>• Password: user12345<br><br>Atribut HTML required pada kolom #chat-input dihapus via JavaScript untuk bypass validasi klien.<br><br>Kolom pesan (body) dibiarkan kosong (""), lalu tombol Kirim diklik.<br><br>Pengujian memverifikasi bahwa validasi sisi klien menampilkan error "Pesan tidak boleh kosong".</td>
+<td>Tampil pesan validasi "Pesan tidak boleh kosong" dan pesan tidak tersimpan ke database</td>
+<td>Sistem menolak pengiriman pesan kosong dan menampilkan pesan error validasi di area chat</td>
+<td class="passed">Passed</td>
+<td>10/06/2026</td>
+<td></td>
+</tr>
+
+<tr>
+<td>TC-PB25-003</td>
+<td>User - Chat Hubungi Admin</td>
+<td>Kirim Pesan Melebihi Batas Karakter (Negative)</td>
+<td>User sudah login dan berada di halaman /chat. Atribut HTML maxlength pada input di-bypass menggunakan JavaScript agar user dapat mengetik melebihi batas 1000 karakter.</td>
+<td>1. Login sebagai user dan buka /chat<br>2. Tunggu halaman selesai dimuat (teks "Hubungi Admin" muncul)<br>3. Hapus atribut maxlength dari elemen #chat-input menggunakan perintah JavaScript: document.getElementById('chat-input').removeAttribute('maxlength')<br>4. Ketik/paste pesan sebanyak 1005 karakter ke kolom input<br>5. Klik tombol #chat-submit</td>
+<td>Login menggunakan kredensial:<br>• Email: user@greennovate.test<br>• Password: user12345<br><br>Atribut HTML maxlength pada kolom #chat-input dihapus via JavaScript untuk bypass validasi klien.<br><br>Kolom pesan (body) diisi dengan string 1005 karakter huruf "A" berulang (str_repeat('A', 1005)), yaitu 5 karakter melebihi batas maksimal 1000.<br><br>Tombol Kirim diklik untuk menguji validasi sisi klien.</td>
+<td>Tampil pesan validasi "Pesan maksimal 1000 karakter" dan pesan tidak tersimpan ke database</td>
+<td>Sistem menolak pengiriman pesan yang melebihi 1000 karakter dan menampilkan pesan error validasi</td>
+<td class="passed">Passed</td>
+<td>10/06/2026</td>
+<td></td>
+</tr>
+
+<tr>
+<td>TC-PB25-004</td>
+<td>Admin - Chat Hubungi Admin</td>
+<td>Admin Membalas Pesan User (Positive)</td>
+<td>Terdapat percakapan aktif dari user di database (tabel conversations dengan status = open dan minimal 1 record di tabel messages). Admin sudah login dengan kredensial valid dan memiliki role admin.</td>
+<td>1. Sistem secara otomatis membuat data percakapan (conversation) dan pesan awal "Pesan untuk Admin" dari user ke database<br>2. Login sebagai Admin<br>3. Buka halaman percakapan di /admin/chat/{id} (id = ID conversation yang baru dibuat)<br>4. Tunggu halaman selesai dimuat (teks "Percakapan" muncul)<br>5. Ketik teks balasan "Terima kasih, kami akan segera proses" di kolom #chat-input<br>6. Klik tombol #chat-submit<br>7. Verifikasi bahwa balasan muncul di layar dan tersimpan di database</td>
+<td>A. Seed Data (Persiapan Database):<br>• Dibuat/dicari record conversations dengan user_id milik user@greennovate.test dan status = open<br>• Dibuat record messages dengan body = "Pesan untuk Admin" dan sender_id milik user tersebut<br><br>B. Interaksi Admin:<br>• Email login Admin: pardede281204@gmail.com<br>• URL yang dikunjungi: /admin/chat/{id} (ID conversation dari langkah A)<br>• Isi kolom pesan balasan (body): "Terima kasih, kami akan segera proses"<br><br>C. Verifikasi Database:<br>• Setelah submit, sistem memverifikasi bahwa record baru di tabel messages tersimpan dengan sender_id = ID Admin dan body = teks balasan yang dikirim.</td>
+<td>Balasan tampil di layar Admin, dan record baru tersimpan di tabel messages dengan sender_id milik Admin</td>
+<td>Sistem berhasil menyimpan balasan Admin ke database dan menampilkan balasan tersebut di halaman percakapan</td>
+<td class="passed">Passed</td>
+<td>10/06/2026</td>
+<td></td>
+</tr>
+
+<tr>
+<td>TC-PB25-005</td>
+<td>User - Chat Hubungi Admin</td>
+<td>Riwayat Percakapan Tetap Tersimpan (Positive)</td>
+<td>User pernah mengirim pesan sebelumnya (data pesan sudah ada di tabel messages yang terhubung dengan conversations milik user). User sudah login dengan kredensial valid.</td>
+<td>1. Sistem secara otomatis membuat data pesan "Halo, saya ingin tanya soal donasi saya" ke database untuk user terkait<br>2. Login sebagai user<br>3. Buka halaman /chat<br>4. Tunggu hingga teks pesan riwayat muncul di area chat (maks 10 detik)</td>
+<td>A. Seed Data (Persiapan Database):<br>• Dibuat/dicari record conversations dengan user_id milik user@greennovate.test dan status = open<br>• Dibuat record messages dengan body = "Halo, saya ingin tanya soal donasi saya" dan sender_id milik user tersebut<br><br>B. Login dan Navigasi:<br>• Email login: user@greennovate.test<br>• Password: user12345<br>• URL yang dikunjungi: /chat<br><br>Tidak ada interaksi form tambahan — pengujian hanya memverifikasi bahwa pesan yang sudah tersimpan sebelumnya berhasil dimuat dan ditampilkan secara otomatis oleh sistem polling AJAX saat halaman dibuka.</td>
+<td>Teks pesan sebelumnya "Halo, saya ingin tanya soal donasi saya" otomatis langsung muncul dan terlihat di area chat</td>
+<td>Sistem berhasil memuat dan menampilkan riwayat percakapan lama secara berurutan saat halaman dibuka</td>
+<td class="passed">Passed</td>
+<td>10/06/2026</td>
+<td></td>
+</tr>
+
+<tr>
+<td>TC-PB25-006</td>
+<td>User - Chat Hubungi Admin</td>
+<td>User Akses Percakapan User Lain - Isolasi Data (Negative)</td>
+<td>Terdapat percakapan milik user lain (User B / user dummy) di database. User A (user@greennovate.test) sudah login dengan kredensial valid.</td>
+<td>1. Sistem secara otomatis membuat user dummy (User B) dengan role user beserta percakapannya di database<br>2. Login sebagai User A (user@greennovate.test)<br>3. Akses endpoint /chat/messages?conversation_id={id_milik_User_B} secara langsung melalui browser<br>4. Setelah pengujian, data user dummy dan percakapannya dihapus dari database (cleanup)</td>
+<td>A. Seed Data (Persiapan Database):<br>• Dibuat user dummy baru (User B) menggunakan factory dengan role = user<br>• Dibuat record conversations dengan user_id milik User B dan status = open<br><br>B. Login sebagai User A:<br>• Email login: user@greennovate.test<br>• Password: user12345<br><br>C. Akses Ilegal:<br>• URL yang dikunjungi: /chat/messages?conversation_id={id} — di mana {id} adalah ID conversation milik User B (bukan milik User A)<br>• Parameter conversation_id sengaja diisi dengan ID percakapan milik user lain untuk menguji isolasi data antar user.</td>
+<td>Sistem menolak akses dan mengembalikan pesan "Anda tidak memiliki akses ke percakapan ini" (HTTP 403)</td>
+<td>Sistem berhasil menolak akses ilegal ke percakapan milik pengguna lain dan mengembalikan pesan error 403</td>
+<td class="passed">Passed</td>
+<td>10/06/2026</td>
+<td></td>
+</tr>
+
+<tr>
+<td>TC-PB25-007</td>
+<td>User - Chat Hubungi Admin</td>
+<td>Akses Halaman Chat Tanpa Login (Negative)</td>
+<td>Tidak ada sesi login aktif (pengguna dalam keadaan logout). Middleware auth aktif dan melindungi rute /chat.</td>
+<td>1. Pastikan pengguna sudah logout (panggil fungsi logout untuk menghapus sesi)<br>2. Akses halaman /chat secara langsung melalui browser tanpa login terlebih dahulu</td>
+<td>Sesi login: Tidak ada (pengguna sudah di-logout secara eksplisit sebelum pengujian dimulai).<br><br>URL yang dikunjungi: /chat<br><br>Kredensial: Tidak ada — tidak ada email atau password yang diinputkan.<br><br>Tidak ada data form yang diinputkan. Pengujian hanya memverifikasi bahwa middleware auth secara otomatis mengarahkan pengguna yang belum login ke halaman /login.</td>
+<td>Sistem otomatis mengalihkan (redirect) pengguna ke halaman /login</td>
+<td>Sistem berhasil mendeteksi bahwa pengguna belum login dan mengarahkan ke halaman login</td>
+<td class="passed">Passed</td>
+<td>10/06/2026</td>
+<td></td>
+</tr>
+
+<tr>
+<td>TC-PB25-008</td>
+<td>User - Chat Hubungi Admin</td>
+<td>Petugas Akses Halaman Chat User (Negative)</td>
+<td>User dengan role petugas sudah login dengan kredensial valid. Middleware pengecekan role aktif dan melindungi rute /chat agar hanya bisa diakses oleh role user.</td>
+<td>1. Login sebagai petugas dengan email petugas@greennovate.test<br>2. Akses halaman /chat (rute yang seharusnya hanya untuk user biasa)</td>
+<td>Login menggunakan kredensial:<br>• Email: petugas@greennovate.test<br>• Password: (kredensial valid milik akun petugas)<br>• Role akun yang login: petugas (bukan user)<br><br>URL yang dikunjungi: /chat<br><br>Tidak ada data form yang diinputkan. Pengujian hanya memverifikasi bahwa middleware role-checking mendeteksi bahwa role petugas tidak diizinkan mengakses rute /chat dan secara otomatis mengarahkan ke dashboard petugas.</td>
+<td>Sistem otomatis menolak dan mengalihkan ke halaman /petugas/dashboard</td>
+<td>Sistem berhasil menolak akses role petugas ke halaman chat user dan mengarahkan ke dashboard petugas</td>
+<td class="passed">Passed</td>
+<td>10/06/2026</td>
+<td></td>
+</tr>
+
+<tr>
+<td>TC-PB25-009</td>
+<td>User - Chat Hubungi Admin</td>
+<td>Admin Akses Halaman Chat User (Negative)</td>
+<td>User dengan role admin sudah login dengan kredensial valid. Middleware pengecekan role aktif dan melindungi rute /chat agar hanya bisa diakses oleh role user.</td>
+<td>1. Login sebagai admin dengan email pardede281204@gmail.com<br>2. Akses halaman /chat (rute yang seharusnya hanya untuk user biasa)</td>
+<td>Login menggunakan kredensial:<br>• Email: pardede281204@gmail.com<br>• Password: (kredensial valid milik akun admin)<br>• Role akun yang login: admin (bukan user)<br><br>URL yang dikunjungi: /chat (rute khusus user biasa)<br><br>Tidak ada data form yang diinputkan. Pengujian hanya memverifikasi bahwa middleware role-checking mendeteksi bahwa role admin tidak diizinkan mengakses rute /chat dan secara otomatis mengarahkan ke dashboard admin.</td>
+<td>Sistem otomatis menolak dan mengalihkan ke halaman /admin/dashboard</td>
+<td>Sistem berhasil menolak akses role admin ke halaman chat user biasa dan mengarahkan ke dashboard admin</td>
+<td class="passed">Passed</td>
+<td>10/06/2026</td>
+<td></td>
+</tr>
+
+</table>
+</body>
+</html>
