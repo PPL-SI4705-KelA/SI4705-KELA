@@ -52,7 +52,7 @@
     <div class="flex flex-wrap gap-2 mb-6">
         <a href="{{ route('riwayat.index') }}" class="filter-btn {{ !$filterTipe ? 'active' : '' }}">Semua</a>
         <a href="{{ route('riwayat.index', ['tipe' => 'donasi']) }}" class="filter-btn {{ $filterTipe === 'donasi' ? 'active' : '' }}">💝 Donasi</a>
-        <a href="{{ route('riwayat.index', ['tipe' => 'pembelian']) }}" class="filter-btn {{ $filterTipe === 'pembelian' ? 'active' : '' }}">🛒 Pembelian</a>
+        <a href="{{ route('riwayat.index', ['tipe' => 'pembelian']) }}" class="filter-btn {{ $filterTipe === 'pembelian' ? 'active' : '' }}">🛒 Langganan</a>
         <a href="{{ route('riwayat.index', ['tipe' => 'kegiatan']) }}" class="filter-btn {{ $filterTipe === 'kegiatan' ? 'active' : '' }}">🌱 Kegiatan</a>
     </div>
 
@@ -195,6 +195,8 @@ function renderDetail(d) {
                 <tr><td style="padding:6px 0;color:#6b7280">Tanggal</td><td style="padding:6px 0;font-weight:600;color:#111827">${d.tanggal}</td></tr>`;
 
     if (d.jumlah) html += `<tr><td style="padding:6px 0;color:#6b7280">Jumlah</td><td style="padding:6px 0;font-weight:600;color:#0D8B41">${d.jumlah}</td></tr>`;
+    if (d.pohon_tertanam !== undefined && d.pohon_tertanam !== null) html += `<tr><td style="padding:6px 0;color:#6b7280">Pohon Tertanam</td><td style="padding:6px 0;font-weight:600;color:#0D8B41">${d.pohon_tertanam} Pohon</td></tr>`;
+    if (d.o2_contribution) html += `<tr><td style="padding:6px 0;color:#6b7280">Kontribusi O2</td><td style="padding:6px 0;font-weight:600;color:#0D8B41">${d.o2_contribution} kg/bulan 💨</td></tr>`;
     if (d.metode) html += `<tr><td style="padding:6px 0;color:#6b7280">Metode</td><td style="padding:6px 0;color:#111827">${d.metode}</td></tr>`;
     if (d.tanggal_kegiatan) html += `<tr><td style="padding:6px 0;color:#6b7280">Tanggal Kegiatan</td><td style="padding:6px 0;color:#111827">${d.tanggal_kegiatan}</td></tr>`;
     if (d.lokasi) html += `<tr><td style="padding:6px 0;color:#6b7280">Lokasi</td><td style="padding:6px 0;color:#111827">${d.lokasi}</td></tr>`;
@@ -203,15 +205,30 @@ function renderDetail(d) {
 
     html += `</table></div>`;
 
-    // QR Code
-    if (d.has_qr && d.qr_url) {
-        html += `<div style="background:#f9fafb;border:2px dashed #e5e7eb;border-radius:12px;padding:20px;text-align:center;margin-bottom:16px">
-            <p style="font-size:0.75rem;font-weight:600;color:#6b7280;margin-bottom:10px">QR Code</p>
-            <img src="${d.qr_url}" alt="QR Code" style="max-width:160px;margin:0 auto;border-radius:8px">
+    if (d.qr_url) {
+        html += `<div style="text-align:center;margin-top:20px;border-top:1px solid #f3f4f6;padding-top:15px">
+            <p style="font-size:12px;color:#6b7280;margin-bottom:10px">QR Code Verifikasi</p>
+            <img src="${d.qr_url}" alt="QR Code" style="width:120px;height:120px;border-radius:8px;border:1px solid #e5e7eb;padding:5px">
         </div>`;
     }
 
-    // Status Menunggu info
+    if (d.tipe_kegiatan === 'tanam_pohon' || d.tipe_kegiatan === 'beli_pohon') {
+        html += `<div style="text-align:center;margin-top:20px;border-top:1px solid #f3f4f6;padding-top:15px">`;
+        if (d.status_label === 'Sukses') {
+            let certUrl = d.tipe === 'pembelian' ? '/pembelian/' + d.id + '/sertifikat' : '/donasi/' + d.id + '/sertifikat';
+            html += `<a href="${certUrl}" class="inline-flex items-center gap-2 bg-green-600 text-white font-medium px-4 py-2 rounded-xl hover:bg-green-700 transition shadow-sm text-sm" title="Unduh Sertifikat Digital Anda">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                Unduh Sertifikat
+            </a>`;
+        } else {
+            html += `<button disabled class="inline-flex items-center gap-2 bg-gray-300 text-gray-500 font-medium px-4 py-2 rounded-xl cursor-not-allowed text-sm" title="Sertifikat tersedia setelah donasi berhasil diverifikasi">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                Unduh Sertifikat
+            </button>`;
+        }
+        html += `</div>`;
+    }
+
     if (d.status_label === 'Menunggu' || d.status_label === 'Terdaftar') {
         html += `<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:14px;margin-bottom:16px;display:flex;align-items:start;gap:10px">
             <svg style="width:20px;height:20px;color:#d97706;flex-shrink:0;margin-top:1px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
