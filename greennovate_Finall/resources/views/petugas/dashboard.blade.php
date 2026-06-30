@@ -12,7 +12,7 @@
         <div class="absolute right-20 bottom-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2"></div>
         <div class="relative z-10">
             <h1 class="text-2xl font-bold mb-1">{{ $greeting }}, {{ $user->name }} 👋</h1>
-            <p class="text-green-100 text-sm">
+            <p class="text-green-100 text-sm" id="realtime-clock">
                 {{ now()->translatedFormat('l, d F Y • H:i') }} WIB
             </p>
             <div class="mt-3 flex items-center gap-2 text-sm text-green-100">
@@ -289,6 +289,30 @@
 
 @push('scripts')
 <script>
+    function updateRealTimeClock() {
+        const clockElement = document.getElementById('realtime-clock');
+        if (clockElement) {
+            const now = new Date();
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            
+            const dayName = days[now.getDay()];
+            const day = String(now.getDate()).padStart(2, '0');
+            const monthName = months[now.getMonth()];
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            clockElement.innerHTML = `${dayName}, ${day} ${monthName} ${year} • ${hours}:${minutes} WIB`;
+        }
+    }
+
+    // Perbarui waktu secara langsung saat load dan setiap 60 detik agar realtime
+    updateRealTimeClock();
+    setInterval(updateRealTimeClock, 60000);
+</script>
+
+<script>
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').content;
     let jenisPohonData = [];
 
@@ -438,7 +462,7 @@
         }
 
         const formData = new FormData();
-        formData.append('foto', fotoInput.files[0]);
+        formData.append('foto[]', fotoInput.files[0]);
 
         btn.disabled = true;
         btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg> Mengunggah...';

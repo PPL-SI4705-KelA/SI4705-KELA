@@ -40,11 +40,7 @@
     <div class="p-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
         <form id="chat-form" method="POST" action="{{ route('admin.chat.reply', $conversation->id) }}" class="flex gap-2 items-center" enctype="multipart/form-data">
             @csrf
-            <!-- File Input -->
-            <label for="chat-attachment" class="cursor-pointer text-gray-500 hover:text-green-600 transition p-2 bg-gray-200 rounded-full shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
-            </label>
-            <input type="file" id="chat-attachment" name="attachment" class="hidden" accept=".jpg,.jpeg,.png,.pdf">
+
 
             <input type="text" id="chat-input" name="body" 
                 class="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 text-sm shadow-sm" 
@@ -54,8 +50,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
             </button>
         </form>
-        <!-- Attachment Preview Name -->
-        <p id="attachment-name" class="text-xs text-green-600 font-medium mt-1 hidden"></p>
+
         <p id="chat-error" class="text-red-500 text-sm mt-1 hidden"></p>
     </div>
 </div>
@@ -69,17 +64,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatInput = document.getElementById('chat-input');
     const chatSubmit = document.getElementById('chat-submit');
     const chatError = document.getElementById('chat-error');
-    const chatAttachment = document.getElementById('chat-attachment');
-    const attachmentName = document.getElementById('attachment-name');
     
-    chatAttachment.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            attachmentName.textContent = 'File: ' + this.files[0].name;
-            attachmentName.classList.remove('hidden');
-        } else {
-            attachmentName.classList.add('hidden');
-        }
-    });
+
 
     let adminId = {{ Auth::id() }};
     const conversationId = {{ $conversation->id }};
@@ -126,8 +112,9 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(res => res.json())
             .then(data => {
-                if(data.success) fetchMessages();
-                else alert(data.message || data.errors?.body[0] || "Gagal mengedit pesan");
+                if(data.success) {
+                    updateMessageUI(data.data);
+                } else alert(data.message || data.errors?.body[0] || "Gagal mengedit pesan");
             });
         }
     };
@@ -143,8 +130,11 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(res => res.json())
             .then(data => {
-                if(data.success) fetchMessages();
-                else alert(data.message || "Gagal menghapus pesan");
+                if(data.success) {
+                    const wrapper = document.getElementById(`msg-wrapper-${id}`);
+                    if (wrapper) wrapper.remove();
+                    renderedMessageIds.delete(id);
+                } else alert(data.message || "Gagal menghapus pesan");
             });
         }
     };
@@ -177,26 +167,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const wrapper = document.createElement('div');
         wrapper.id = `msg-wrapper-${msg.id}`;
-        wrapper.className = `flex ${isAdmin ? 'justify-end' : 'justify-start'} msg-menu-container group relative`;
+        wrapper.className = `flex ${isAdmin ? 'justify-end' : 'justify-start'} items-start msg-menu-container group mb-3`;
         
-        const bubbleContainer = document.createElement('div');
-        bubbleContainer.className = `max-w-[75%] flex flex-col gap-1 relative ${isAdmin ? 'items-end' : 'items-start'}`;
-
-        const senderLabel = document.createElement('span');
-        senderLabel.className = 'text-[11px] font-medium text-gray-500 px-1';
-        senderLabel.textContent = isAdmin ? 'Anda (Admin)' : '{{ addslashes($conversation->user->name) }}';
-        bubbleContainer.appendChild(senderLabel);
-
-        // Menu Options (Edit/Delete)
+        let menuContainer = null;
         if (isAdmin) {
+            menuContainer = document.createElement('div');
+            menuContainer.className = 'relative opacity-0 group-hover:opacity-100 transition px-2 pt-4';
+            
             const menuBtn = document.createElement('button');
             menuBtn.innerHTML = '&#8942;'; // 3 vertical dots
-            menuBtn.className = 'absolute -left-6 top-5 text-gray-400 hover:text-gray-600 px-2 opacity-0 group-hover:opacity-100 transition z-10';
+            menuBtn.className = 'text-gray-400 hover:text-gray-600 font-bold text-lg focus:outline-none px-1';
             menuBtn.onclick = (e) => { e.stopPropagation(); toggleMenu(msg.id); };
             
             const dropdown = document.createElement('div');
             dropdown.id = `msg-menu-${msg.id}`;
-            dropdown.className = 'msg-menu-dropdown hidden absolute -left-32 top-10 bg-white border border-gray-200 shadow-md rounded-md text-sm z-20 w-28 text-gray-700 overflow-hidden';
+            dropdown.className = 'msg-menu-dropdown hidden absolute right-full top-2 mr-1 bg-white border border-gray-200 shadow-md rounded-md text-sm z-50 w-28 text-gray-700 overflow-hidden';
             
             const safeBody = (msg.body || '').replace(/"/g, '&quot;').replace(/'/g, "\\'");
             
@@ -205,31 +190,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 <button type="button" onclick="deleteMessage(${msg.id})" class="w-full text-left px-3 py-2 hover:bg-gray-100 text-red-600 flex items-center gap-2">🗑 Hapus</button>
             `;
             
-            bubbleContainer.appendChild(menuBtn);
-            bubbleContainer.appendChild(dropdown);
+            menuContainer.appendChild(menuBtn);
+            menuContainer.appendChild(dropdown);
         }
+
+        const bubbleContainer = document.createElement('div');
+        bubbleContainer.className = `max-w-[75%] flex flex-col gap-1 relative flex-shrink-0 ${isAdmin ? 'items-end' : 'items-start'}`;
+
+        const senderLabel = document.createElement('span');
+        senderLabel.className = 'text-[11px] font-medium text-gray-500 px-1';
+        senderLabel.textContent = isAdmin ? 'Anda (Admin)' : '{{ addslashes($conversation->user->name) }}';
+        bubbleContainer.appendChild(senderLabel);
 
         const bubble = document.createElement('div');
         bubble.className = `rounded-2xl px-4 py-2 text-sm break-words shadow-sm relative ${isAdmin ? 'bg-green-600 text-white rounded-tr-none' : 'bg-gray-100 text-gray-800 rounded-tl-none border border-gray-200'}`;
         
-        if (msg.attachment_path) {
-            const attachmentUrl = `/storage/${msg.attachment_path}`;
-            if (msg.attachment_type === 'image') {
-                const img = document.createElement('img');
-                img.src = attachmentUrl;
-                img.className = 'max-w-full h-auto rounded-lg mb-2 cursor-pointer bg-white';
-                img.style.maxHeight = '200px';
-                img.onclick = () => window.open(attachmentUrl, '_blank');
-                bubble.appendChild(img);
-            } else {
-                const link = document.createElement('a');
-                link.href = attachmentUrl;
-                link.target = '_blank';
-                link.className = `flex items-center gap-2 px-3 py-2 rounded-lg mb-2 text-sm font-medium ${isAdmin ? 'bg-green-700 text-white hover:bg-green-800' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'}`;
-                link.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> Buka Dokumen`;
-                bubble.appendChild(link);
-            }
-        }
+
 
         if (msg.body) {
             const body = document.createElement('p');
@@ -257,6 +233,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         bubbleContainer.appendChild(bubble);
         bubbleContainer.appendChild(meta);
+        if (isAdmin && menuContainer) {
+            wrapper.appendChild(menuContainer);
+        }
         wrapper.appendChild(bubbleContainer);
 
         chatMessages.appendChild(wrapper);
@@ -295,10 +274,9 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         const body = chatInput.value.trim();
-        const hasFile = chatAttachment.files.length > 0;
         
-        if (!body && !hasFile) {
-            chatError.textContent = 'Pesan atau lampiran tidak boleh kosong';
+        if (!body) {
+            chatError.textContent = 'Pesan tidak boleh kosong';
             chatError.classList.remove('hidden');
             return;
         }
@@ -313,7 +291,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const formData = new FormData();
         formData.append('body', body);
-        if (hasFile) formData.append('attachment', chatAttachment.files[0]);
         formData.append('_token', document.querySelector('input[name="_token"]').value);
 
         fetch(`{{ route('admin.chat.reply', $conversation->id) }}`, {
@@ -328,9 +305,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 chatInput.value = '';
-                chatAttachment.value = '';
-                attachmentName.classList.add('hidden');
-                fetchMessages();
+                appendMessage(data.data); // Tampilkan langsung balasan yang baru dikirim
             } else if (data.errors) {
                 chatError.textContent = data.errors.body[0] || 'Gagal mengirim pesan.';
                 chatError.classList.remove('hidden');
@@ -346,7 +321,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Initial fetch and polling
+    // Render messages already loaded server-side (instant, no network round-trip).
+    const initialMessages = @json($messages);
+    initialMessages.forEach(m => appendMessage(m));
+
+    // Then poll for updates / new messages from the other party.
     fetchMessages();
     setInterval(fetchMessages, 3000);
 });

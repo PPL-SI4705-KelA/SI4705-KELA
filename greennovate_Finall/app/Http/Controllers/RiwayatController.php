@@ -184,25 +184,14 @@ class RiwayatController extends Controller
                 if (!$record)
                     abort(404, 'Data riwayat tidak ditemukan.');
 
-                // Hitung pohon tertanam berdasarkan jenis pohon yang cocok dengan nama item
-                $pohon_tertanam  = 0;
-                $jenisPohons     = \App\Models\JenisPohon::all();
-                $matchedJenisPohon = null;
-                foreach ($jenisPohons as $jp) {
-                    if (stripos($record->nama_item, $jp->nama) !== false) {
-                        $matchedJenisPohon = $jp;
-                        break;
-                    }
-                }
-                if ($matchedJenisPohon) {
-                    $pohon_tertanam = \App\Models\Realisasi::where('jenis_pohon_id', $matchedJenisPohon->id)->sum('jumlah');
-                }
+                $pohon_tertanam = $record->jumlah_item;
 
                 $data = [
                     'id'              => $record->id,
                     'tipe'            => 'pembelian',
                     'tipe_label'      => 'Pembelian',
                     'nama'            => $record->nama_item,
+                    'tipe_kegiatan'   => 'beli_pohon',
                     'tanggal'         => $record->created_at->translatedFormat('d F Y, H:i'),
                     'status_label'    => RiwayatMapper::statusMapper($record->status, 'pembelian'),
                     'status_color'    => RiwayatMapper::statusColor(RiwayatMapper::statusMapper($record->status, 'pembelian')),
@@ -237,6 +226,7 @@ class RiwayatController extends Controller
                     'tipe'             => 'kegiatan',
                     'tipe_label'       => 'Kegiatan',
                     'nama'             => $record->kegiatan->nama ?? 'Kegiatan Tidak Ditemukan',
+                    'tipe_kegiatan'    => $record->kegiatan?->tipe_kegiatan ?? null,
                     'tanggal'          => $record->created_at->translatedFormat('d F Y, H:i'),
                     'tanggal_kegiatan' => $record->kegiatan->tanggal
                         ? $record->kegiatan->tanggal->translatedFormat('d F Y')

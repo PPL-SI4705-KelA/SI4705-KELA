@@ -1,0 +1,113 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<!--[if gte mso 9]><xml>
+<x:ExcelWorkbook>
+<x:ExcelWorksheets>
+<x:ExcelWorksheet>
+<x:Name>Test Case Edit Hapus</x:Name>
+<x:WorksheetOptions>
+<x:DisplayGridlines/>
+</x:WorksheetOptions>
+</x:ExcelWorksheet>
+</x:ExcelWorksheets>
+</x:ExcelWorkbook>
+</xml><![endif]-->
+<style>
+td, th {
+  mso-number-format:\@;
+  vertical-align: top;
+  border: 1px solid #000;
+  padding: 6px;
+  font-family: Calibri, Arial, sans-serif;
+  font-size: 11pt;
+}
+th {
+  background-color: #4472C4;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+}
+.passed {
+  background-color: #C6EFCE;
+  color: #006100;
+  font-weight: bold;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+<table border="1" cellspacing="0" cellpadding="4">
+<tr>
+<th>ID</th>
+<th>Modul/Fitur</th>
+<th>Test Case Scenario</th>
+<th>Precondition</th>
+<th>Steps</th>
+<th>Input</th>
+<th>Expected Result</th>
+<th>Output</th>
+<th>Status</th>
+<th>Tanggal Uji</th>
+<th>Catatan</th>
+</tr>
+
+<tr>
+<td>TC-PB28-001</td>
+<td>User - Edit &amp; Hapus Pesan Chat</td>
+<td>User Mengedit Pesan Miliknya Sendiri (Positive)</td>
+<td>User sudah login dengan kredensial valid, memiliki role user, terdapat percakapan aktif di database, user memiliki minimal satu pesan yang pernah dikirim dengan teks "Pesan sebelum diedit", migration kolom is_edited, edited_at, dan deleted_at sudah dijalankan</td>
+<td>1. Seed data percakapan dan pesan "Pesan sebelum diedit" untuk user terkait<br>2. Login sebagai user<br>3. Buka halaman /chat<br>4. Tunggu pesan "Pesan sebelum diedit" tampil<br>5. Simulasi klik tombol edit (⋮ → ✏ Edit) pada pesan tersebut<br>6. Masukkan teks baru pada dialog prompt<br>7. Simpan</td>
+<td>A. Seed Data (Persiapan Database):<br>• Dicari/dibuat record conversations dengan user_id milik user@greennovate.test dan status = open (menggunakan firstOrCreate, tanpa menghapus data percakapan lama)<br>• Dibuat record messages baru dengan body = "Pesan sebelum diedit" dan sender_id milik user tersebut<br><br>B. Login dan Navigasi:<br>• Email login: user@greennovate.test<br>• Password: user12345<br>• URL yang dikunjungi: /chat<br><br>C. Interaksi Edit Pesan:<br>• Fungsi window.prompt() di-override via JavaScript agar otomatis mengembalikan teks baru tanpa dialog interaktif<br>• Teks lama (sebelum edit): "Pesan sebelum diedit"<br>• Teks baru (setelah edit): "Pesan yang sudah diedit via Dusk"<br>• Fungsi editMessage(id, body) dipanggil via JavaScript untuk memicu proses edit melalui AJAX PATCH ke endpoint /message/{id}<br><br>D. Verifikasi:<br>• Teks pesan di layar berubah menjadi teks baru<br>• Label "✏ diedit" muncul di bawah pesan<br>• Di database: kolom is_edited = true dan edited_at terisi timestamp</td>
+<td>Pesan di layar langsung berubah menjadi teks baru "Pesan yang sudah diedit via Dusk" dan muncul tulisan penanda "✏ diedit" di bawah teks pesan. Di database kolom is_edited menjadi true dan edited_at terisi timestamp.</td>
+<td>Sistem berhasil memperbarui isi pesan, kolom is_edited menjadi true, edited_at terisi, dan antarmuka menampilkan teks baru beserta label ✏ diedit</td>
+<td class="passed">Passed</td>
+<td>10/06/2026</td>
+<td></td>
+</tr>
+
+<tr>
+<td>TC-PB28-002</td>
+<td>User - Edit &amp; Hapus Pesan Chat</td>
+<td>User Menghapus Pesan Miliknya Sendiri (Positive)</td>
+<td>User sudah login dengan kredensial valid, memiliki role user, terdapat percakapan aktif di database, user memiliki minimal satu pesan yang pernah dikirim dengan teks "Pesan yang akan dihapus", migration kolom deleted_at (SoftDeletes) sudah dijalankan</td>
+<td>1. Seed data percakapan dan pesan "Pesan yang akan dihapus" untuk user terkait<br>2. Login sebagai user<br>3. Buka halaman /chat<br>4. Tunggu pesan "Pesan yang akan dihapus" tampil<br>5. Simulasi klik tombol hapus (⋮ → 🗑 Hapus) pada pesan tersebut<br>6. Berikan konfirmasi OK pada dialog konfirmasi</td>
+<td>A. Seed Data (Persiapan Database):<br>• Dicari/dibuat record conversations dengan user_id milik user@greennovate.test dan status = open (menggunakan firstOrCreate, tanpa menghapus data percakapan lama)<br>• Dibuat record messages baru dengan body = "Pesan yang akan dihapus" dan sender_id milik user tersebut<br><br>B. Login dan Navigasi:<br>• Email login: user@greennovate.test<br>• Password: user12345<br>• URL yang dikunjungi: /chat<br><br>C. Interaksi Hapus Pesan:<br>• Fungsi window.confirm() di-override via JavaScript agar otomatis mengembalikan true (menerima konfirmasi) tanpa dialog interaktif<br>• Pesan target yang akan dihapus: "Pesan yang akan dihapus"<br>• Fungsi deleteMessage(id) dipanggil via JavaScript untuk memicu proses hapus melalui AJAX DELETE ke endpoint /message/{id}<br><br>D. Verifikasi:<br>• Pesan menghilang dari tampilan area chat<br>• Di database: data tidak terhapus permanen (soft delete), kolom deleted_at terisi timestamp</td>
+<td>Pesan tersebut langsung menghilang (dihapus) dari layar area percakapan secara sempurna. Data di database tidak terhapus permanen (soft delete, kolom deleted_at terisi).</td>
+<td>Sistem berhasil melakukan soft delete pada pesan, pesan menghilang dari tampilan chat, dan kolom deleted_at terisi di database</td>
+<td class="passed">Passed</td>
+<td>10/06/2026</td>
+<td></td>
+</tr>
+
+<tr>
+<td>TC-PB28-003</td>
+<td>Admin - Edit &amp; Hapus Pesan Chat</td>
+<td>Admin Mengedit Pesan Miliknya Sendiri (Positive)</td>
+<td>Admin sudah login dengan kredensial valid, memiliki role admin, terdapat percakapan aktif di database, admin memiliki minimal satu pesan balasan yang pernah dikirim dengan teks "Balasan sebelum diedit", migration kolom is_edited, edited_at, dan deleted_at sudah dijalankan</td>
+<td>1. Seed data percakapan dan pesan "Balasan sebelum diedit" dari admin ke database<br>2. Login sebagai admin<br>3. Buka halaman /admin/chat/{id}<br>4. Tunggu pesan "Balasan sebelum diedit" tampil<br>5. Simulasi klik tombol edit (⋮ → ✏ Edit) pada pesan tersebut<br>6. Masukkan teks baru pada dialog prompt<br>7. Simpan</td>
+<td>A. Seed Data (Persiapan Database):<br>• Dicari/dibuat record conversations dengan user_id milik user@greennovate.test dan status = open (menggunakan firstOrCreate, tanpa menghapus data percakapan lama)<br>• Dibuat record messages baru dengan body = "Balasan sebelum diedit" dan sender_id milik Admin<br><br>B. Login dan Navigasi:<br>• Email login Admin: pardede281204@gmail.com<br>• URL yang dikunjungi: /admin/chat/{id} (ID conversation dari langkah A)<br><br>C. Interaksi Edit Pesan:<br>• Fungsi window.prompt() di-override via JavaScript agar otomatis mengembalikan teks baru tanpa dialog interaktif<br>• Teks lama (sebelum edit): "Balasan sebelum diedit"<br>• Teks baru (setelah edit): "Balasan yang sudah diedit via Dusk"<br>• Fungsi editMessage(id, body) dipanggil via JavaScript untuk memicu proses edit melalui AJAX PATCH ke endpoint /message/{id}<br><br>D. Verifikasi:<br>• Teks pesan admin di layar berubah menjadi teks baru<br>• Label "✏ diedit" muncul di bawah pesan<br>• Di database: kolom is_edited = true dan edited_at terisi timestamp</td>
+<td>Pesan di layar admin langsung berubah menjadi teks baru "Balasan yang sudah diedit via Dusk" dan muncul tulisan penanda "✏ diedit" di bawah teks pesan. Di database kolom is_edited menjadi true dan edited_at terisi timestamp.</td>
+<td>Sistem berhasil memperbarui isi pesan admin, kolom is_edited menjadi true, edited_at terisi, dan antarmuka menampilkan teks baru beserta label ✏ diedit</td>
+<td class="passed">Passed</td>
+<td>10/06/2026</td>
+<td></td>
+</tr>
+
+<tr>
+<td>TC-PB28-004</td>
+<td>Admin - Edit &amp; Hapus Pesan Chat</td>
+<td>Admin Menghapus Pesan Miliknya Sendiri (Positive)</td>
+<td>Admin sudah login dengan kredensial valid, memiliki role admin, terdapat percakapan aktif di database, admin memiliki minimal satu pesan balasan yang pernah dikirim dengan teks "Balasan yang akan dihapus", migration kolom deleted_at (SoftDeletes) sudah dijalankan</td>
+<td>1. Seed data percakapan dan pesan "Balasan yang akan dihapus" dari admin ke database<br>2. Login sebagai admin<br>3. Buka halaman /admin/chat/{id}<br>4. Tunggu pesan "Balasan yang akan dihapus" tampil<br>5. Simulasi klik tombol hapus (⋮ → 🗑 Hapus) pada pesan tersebut<br>6. Berikan konfirmasi OK pada dialog konfirmasi</td>
+<td>A. Seed Data (Persiapan Database):<br>• Dicari/dibuat record conversations dengan user_id milik user@greennovate.test dan status = open (menggunakan firstOrCreate, tanpa menghapus data percakapan lama)<br>• Dibuat record messages baru dengan body = "Balasan yang akan dihapus" dan sender_id milik Admin<br><br>B. Login dan Navigasi:<br>• Email login Admin: pardede281204@gmail.com<br>• URL yang dikunjungi: /admin/chat/{id} (ID conversation dari langkah A)<br><br>C. Interaksi Hapus Pesan:<br>• Fungsi window.confirm() di-override via JavaScript agar otomatis mengembalikan true (menerima konfirmasi) tanpa dialog interaktif<br>• Pesan target yang akan dihapus: "Balasan yang akan dihapus"<br>• Fungsi deleteMessage(id) dipanggil via JavaScript untuk memicu proses hapus melalui AJAX DELETE ke endpoint /message/{id}<br><br>D. Verifikasi:<br>• Pesan admin menghilang dari tampilan area chat<br>• Di database: data tidak terhapus permanen (soft delete), kolom deleted_at terisi timestamp</td>
+<td>Pesan tersebut langsung menghilang (dihapus) dari layar detail percakapan admin secara sempurna. Data di database tidak terhapus permanen (soft delete, kolom deleted_at terisi).</td>
+<td>Sistem berhasil melakukan soft delete pada pesan admin, pesan menghilang dari tampilan chat admin, dan kolom deleted_at terisi di database</td>
+<td class="passed">Passed</td>
+<td>10/06/2026</td>
+<td></td>
+</tr>
+
+</table>
+</body>
+</html>

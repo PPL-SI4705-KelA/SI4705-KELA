@@ -49,6 +49,7 @@
                             <th class="px-6 py-4">ID Transaksi</th>
                             <th class="px-6 py-4">Nama Pengguna</th>
                             <th class="px-6 py-4">Detail Item</th>
+                            <th class="px-6 py-4">Catatan</th>
                             <th class="px-6 py-4">Total Harga</th>
                             <th class="px-6 py-4">Tanggal Transaksi</th>
                             <th class="px-6 py-4">Bukti</th>
@@ -72,6 +73,9 @@
                             <td class="px-6 py-4">
                                 <div class="font-medium text-gray-900">{{ $p->nama_item }}</div>
                                 <div class="text-xs text-gray-400">Jumlah: {{ $p->jumlah_item }} pcs</div>
+                            </td>
+                            <td class="px-6 py-4 max-w-[200px]">
+                                <div class="text-sm text-gray-700 whitespace-normal break-words">{{ $p->catatan ?: '-' }}</div>
                             </td>
                             <td class="px-6 py-4 text-gray-900 font-bold">
                                 Rp {{ number_format($p->total_harga, 0, ',', '.') }}
